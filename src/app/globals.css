@@ -1,0 +1,26 @@
+@import "tailwindcss";
+
+@theme inline {
+  --color-paper: #f7f5ef;
+  --color-surface: #fffefa;
+  --color-ink: #303e35;
+  --color-muted: #657068;
+  --color-line: #e5e8df;
+  --color-sage: #9bb39c;
+  --color-sage-dark: #3e6249;
+  --color-sage-light: #eaf0e6;
+  --color-clay: #a5664d;
+  --color-clay-light: #f5e9e0;
+  --font-sans: Arial, "PingFang SC", "Microsoft YaHei", sans-serif;
+}
+
+body { background: var(--color-paper); color: var(--color-ink); font-family: var(--font-sans); }
+::selection { background: #dae6d4; }
+a, button, input, textarea { -webkit-tap-highlight-color: transparent; }
+:focus-visible { outline: 2px solid var(--color-sage-dark); outline-offset: 4px; }
+.eyebrow { color: var(--color-sage-dark); font-size: .75rem; font-weight: 600; letter-spacing: .14em; }
+.primary-link { display: inline-flex; align-items: center; justify-content: center; gap: .6rem; border-radius: .9rem; background: var(--color-sage-dark); padding: .85rem 1.25rem; color: white; font-size: .875rem; font-weight: 500; transition: background .2s; }
+.primary-link:hover { background: #304e39; }
+.disabled-button { border-radius: .9rem; background: #e5e8df; color: #59625a; padding: .85rem 1.25rem; font-size: .875rem; cursor: not-allowed; }
+.skip-link { position: absolute; left: 1rem; top: -5rem; z-index: 50; border-radius: .5rem; background: var(--color-surface); padding: 1rem; }
+.skip-link:focus { top: 1rem; }
