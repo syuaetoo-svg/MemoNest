@@ -9,3 +9,7 @@ coverage/
 .vercel/
 .DS_Store
 npm-debug.log*
+
+# Playwright generated artifacts (may include test screenshots)
+/test-results/
+/playwright-report/
