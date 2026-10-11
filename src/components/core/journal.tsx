@@ -296,6 +296,7 @@ export function EntryEditor({
 }
 export function JournalTimeline() {
   const api = useCoreApi();
+  const pageGeneration = useRef(0);
   const [query, setQuery] = useState(""),
     [activeQuery, setActiveQuery] = useState(""),
     [extra, setExtra] = useState<Entry[]>([]),
@@ -309,24 +310,33 @@ export function JournalTimeline() {
   async function more() {
     const next = cursor || data?.nextCursor;
     if (!next) return;
+    const generation = ++pageGeneration.current;
     setLoadingMore(true);
     setMoreError("");
     try {
       const result = await api<{ entries: Entry[]; nextCursor: string | null }>(
         `/api/journal-entries?q=${encodeURIComponent(activeQuery)}&cursor=${encodeURIComponent(next)}`,
       );
+      if (generation !== pageGeneration.current) return;
       setExtra((rows) => [...rows, ...result.entries]);
       setCursor(result.nextCursor || "DONE");
     } catch (e) {
-      setMoreError(messageOf(e));
+      if (generation === pageGeneration.current) setMoreError(messageOf(e));
     } finally {
-      setLoadingMore(false);
+      if (generation === pageGeneration.current) setLoadingMore(false);
     }
+  }
+  function resetPages() {
+    // Search, clear and retry invalidate any in-flight page for the old results.
+    pageGeneration.current++;
+    setExtra([]);
+    setCursor(null);
+    setLoadingMore(false);
+    setMoreError("");
   }
   function search(event: FormEvent) {
     event.preventDefault();
-    setExtra([]);
-    setCursor(null);
+    resetPages();
     setActiveQuery(query.trim());
   }
   const entries = data ? [...data.entries, ...extra] : [];
@@ -359,8 +369,7 @@ export function JournalTimeline() {
           onClick={() => {
             setQuery("");
             setActiveQuery("");
-            setExtra([]);
-            setCursor(null);
+            resetPages();
           }}
         >
           清除筛选
@@ -375,8 +384,7 @@ export function JournalTimeline() {
         <Button
           tone="secondary"
           onClick={() => {
-            setExtra([]);
-            setCursor(null);
+            resetPages();
             void refresh();
           }}
         >

@@ -35,9 +35,9 @@ test("core component recovery and separate permission controls", async (t) => {
     this.removeAttribute("open");
   };
   const originalFetch = globalThis.fetch;
-  const { render, fireEvent, waitFor, cleanup } =
+  const { render, fireEvent, waitFor, cleanup, act } =
     await import("@testing-library/react");
-  const { EntryEditor } = await import("../../src/components/core/journal");
+  const { EntryEditor, JournalTimeline } = await import("../../src/components/core/journal");
   const { MemoryPermission } =
     await import("../../src/components/core/memories");
   const { SessionBoundary } =
@@ -56,6 +56,42 @@ test("core component recovery and separate permission controls", async (t) => {
     updated_at: "2026-01-01T00:00:00Z",
   };
   try {
+    for (const failure of [false, true]) {
+      await t.test(
+        `keyword search ignores an old pagination ${failure ? "failure" : "success"}`,
+        async () => {
+          let complete!: (response: Response) => void;
+          const pending = new Promise<Response>((resolve) => { complete = resolve; });
+          globalThis.fetch = async (url) => {
+            const path = String(url);
+            if (path.includes("cursor=")) return pending;
+            const filtered = path.includes("q=walk");
+            return Response.json({
+              entries: [{ ...entry, title: filtered ? "walk result" : "initial result" }],
+              nextCursor: filtered ? "new-cursor" : "old-cursor",
+            });
+          };
+          const view = render(<IdentityContext value={userId}><JournalTimeline /></IdentityContext>);
+          await waitFor(() => assert.ok(view.getByText("initial result")));
+          fireEvent.click(view.getByRole("button", { name: "加载更早的记录" }));
+          assert.ok(view.getByRole("button", { name: "正在加载…" }));
+          fireEvent.change(view.getByRole("textbox", { name: "原文关键词" }), { target: { value: "walk" } });
+          fireEvent.click(view.getByRole("button", { name: "查找" }));
+          await waitFor(() => assert.ok(view.getByText("walk result")));
+          assert.equal((view.getByRole("button", { name: "加载更早的记录" }) as HTMLButtonElement).disabled, false);
+          await act(async () => {
+            complete(failure
+              ? Response.json({ error: { code: "SERVICE_ERROR", message: "stale pagination error" } }, { status: 503 })
+              : Response.json({ entries: [{ ...entry, id: randomUUID(), title: "stale pagination result" }], nextCursor: null }));
+            await pending;
+          });
+          assert.equal(view.queryByText("stale pagination result"), null);
+          assert.equal(view.queryByText("stale pagination error"), null);
+          assert.ok(view.getByRole("button", { name: "加载更早的记录" }));
+          cleanup();
+        },
+      );
+    }
     await t.test(
       "failed save retains editable draft and retries the same request ID",
       async () => {

@@ -26,12 +26,14 @@ AI Companion & Personal Memory Journal
 
 ```bash
 npm ci
-cp .env.example .env.local
+cp -n .env.example .env.local
 # 配置下面三项，并初始化数据库后启动
 npm run dev
 ```
 
-默认开发端口 3000，云环境通过平台支持的端口转发预览。若默认 npm 缓存不可写，使用 `npm ci --cache /tmp/memonest-npm-cache`。没有服务配置也能预览首页、角色介绍和 UX Lab。
+默认开发端口 3000；保留已有 `.env.local`，不要覆盖。若默认 npm 缓存不可写，使用 `npm ci --cache /tmp/memonest-npm-cache`。没有服务配置也能预览首页、角色介绍和 UX Lab。
+
+`localhost` 只指运行服务的机器：Codex 云端启动后，你电脑上的 localhost 无法直接访问。当前任务界面没有提供预览/端口转发入口，不能把云端地址当作公网链接。开发体验验证可在自己电脑检出现有仓库、单独安全配置环境变量后运行；若其他开发环境提供端口转发，则使用其真实地址并匹配 APP_URL。Vercel 部署目前暂停，不影响现有 Supabase 数据库。
 
 ### 托管 Supabase（实际使用前必需）
 
