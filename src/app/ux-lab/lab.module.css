@@ -1,0 +1,37 @@
+.lab { line-height: 1.7; overflow-wrap: anywhere; }
+.lab :global(label) { min-width: 0; }
+.lab :global(select) { min-width: 0; max-width: 100%; }
+.lab :global(.ux-panel) { min-width: 0; background: var(--color-surface); border: 1px solid var(--color-line); border-radius: 24px; padding: 24px; }
+.lab :global(.ux-button) { min-height: 44px; border: 1px solid #7b877d; border-radius: 12px; padding: 9px 16px; font-size: 14px; font-weight: 500; background: var(--color-surface); color: var(--color-ink); cursor: pointer; transition: background .15s; }
+.lab :global(.ux-button:hover) { background: var(--color-sage-light); }
+.lab :global(.ux-primary) { border-color: var(--color-sage-dark); background: var(--color-sage-dark); color: white; }
+.lab :global(.ux-primary:hover) { background: #304e39; }
+.lab :global(.ux-danger) { border-color: #8a3030; color: #8a3030; }
+.lab :global(.ux-button:disabled) { background: #e5e8df; border-color: #c2c9bf; color: #59625a; cursor: not-allowed; }
+.lab :global(.ux-field) { width: 100%; min-height: 44px; border: 1px solid #7b877d; border-radius: 12px; padding: 12px; background: var(--color-surface); font-size: 16px; color: var(--color-ink); }
+.lab :global(.ux-label) { display: block; font-size: 14px; font-weight: 600; margin-bottom: 8px; }
+.lab :global(.ux-check) { display: flex; align-items: start; gap: 12px; font-size: 14px; padding: 10px 0; }
+.lab :global(.ux-check input) { width: 20px; height: 20px; margin-top: 3px; accent-color: var(--color-sage-dark); flex-shrink: 0; }
+.lab :global(.ux-actions) { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-top: 20px; }
+.lab :global(.ux-notice) { padding: 14px 16px; border-radius: 14px; background: var(--color-sage-light); font-size: 14px; margin: 16px 0; }
+.lab :global(.ux-error) { background: #fbecec; color: #8a3030; }
+.lab :global(.ux-dialog) { width: min(580px, calc(100vw - 32px)); max-height: calc(100dvh - 40px); margin: auto; padding: 24px; border: 1px solid var(--color-line); border-radius: 24px; background: var(--color-surface); color: var(--color-ink); overflow-y: auto; }
+.lab :global(.ux-dialog::backdrop) { background: rgb(30 45 35 / 40%); }
+.lab :global(.ux-dialog-head) { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 20px; }
+.lab :global(.ux-dialog-head h2) { font-size: 20px; font-weight: 600; }
+.lab :global(.ux-message) { max-width: 90%; padding: 16px; border-radius: 20px; background: var(--color-sage-light); overflow-wrap: anywhere; }
+.lab :global(.ux-user-message) { margin-left: auto; background: var(--color-paper); }
+.lab :global(.ux-record-button) { width: 100%; min-height: 44px; text-align: left; border: 1px solid var(--color-line); border-radius: 16px; padding: 20px; background: var(--color-surface); cursor: pointer; }
+.lab :global(.ux-record-button:hover) { border-color: #7b877d; background: var(--color-sage-light); }
+.lab :global(.ux-prototype) { overflow-wrap: anywhere; }
+.lab :global(.ux-chip) { display: inline-block; border-radius: 999px; background: var(--color-clay-light); padding: 4px 12px; font-size: 12px; color: var(--color-ink); }
+.lab :global(.ux-research) { border: 1px dashed #7b877d; border-radius: 18px; padding: 16px; background: var(--color-paper); font-size: 14px; }
+.lab :global(summary) { cursor: pointer; min-height: 44px; display: flex; align-items: center; font-weight: 600; }
+.lab :global(.ux-two-col) { display: grid; gap: 24px; }
+.lab :global(.ux-grid) { display: grid; gap: 16px; }
+.lab :global(.ux-story-claim) { padding: 16px 0; border-top: 1px solid var(--color-line); }
+@media (min-width: 768px) {
+  .lab :global(.ux-two-col) { grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr); }
+  .lab :global(.ux-grid) { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+@media (prefers-reduced-motion: reduce) { .lab :global(*) { transition: none !important; scroll-behavior: auto !important; } }
