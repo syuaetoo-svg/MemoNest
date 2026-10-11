@@ -1,5 +1,6 @@
 # 未来全栈架构与产品边界
 
+> B2 实现追踪：本文件保留第二阶段 A 的历史设计范围；当前身份、记录与授权实现及未验证边界见 [核心全栈说明](CORE_FULLSTACK.md)。
 > 方案状态：设计，未实现。当前只有 Next.js + TypeScript + Tailwind CSS 页面基础；没有 PostgreSQL、AI SDK、身份服务、API 路由或迁移。本阶段不安装这些服务。
 
 ## 1. 整体结构与分期

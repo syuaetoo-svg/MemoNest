@@ -278,7 +278,7 @@ test("research data starts explicitly, pauses, exports no text, restores and cle
   await expect(page.locator("aside.ux-research summary")).toContainText("0 条");
   await expect(page.getByLabel("记录正文")).toHaveValue("");
   await page.goto("/journal");
-  await expect(page.getByLabel("今天发生了什么？")).toBeDisabled();
+  await expect(page.getByRole("heading", { name: /连接你的小屋之前|先登录，让记录有自己的归属/ })).toBeVisible();
   await expect(page.getByText("DO_NOT_EXPORT_BODY")).toHaveCount(0);
 });
 

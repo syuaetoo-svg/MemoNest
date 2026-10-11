@@ -1,7 +1,42 @@
+import { SessionBoundary } from "@/components/core/session-boundary";
 import type { Metadata } from "next";
-import { Card, PageHeading, PhaseNotice } from "@/components/ui";
-
+import { Card, PageHeading } from "@/components/ui";
+import { EntryEditor } from "@/components/core/journal";
+import { AccessGate } from "@/components/core/access-gate";
+import { accountState } from "@/lib/server/supabase";
+export const dynamic = "force-dynamic";
 export const metadata: Metadata = { title: "生活记录" };
-export default function JournalPage() {
-  return <><PageHeading eyebrow="LIFE, ONE MOMENT AT A TIME" title="把生活，轻轻写下来" description="一次散步、一顿晚餐、一个新的决定。那些对你有意义的事情，都值得拥有自己的位置。" /><div className="grid gap-5 md:grid-cols-[1.5fr_1fr]"><Card><h2 className="mb-6 text-xl font-semibold">一篇新的生活记录</h2><fieldset disabled aria-describedby="journal-status" className="space-y-5"><div><label htmlFor="journal-title" className="mb-2 block text-sm font-medium">给这个片刻起个名字</label><input id="journal-title" placeholder="例如：下班路上的一片晚霞" className="w-full rounded-xl border border-line bg-paper p-3 text-sm" /></div><div><label htmlFor="journal-body" className="mb-2 block text-sm font-medium">今天发生了什么？</label><textarea id="journal-body" rows={7} placeholder="记录功能开放后，你可以在这里写下自己的经历和感受。" className="w-full resize-none rounded-xl border border-line bg-paper p-3 text-sm" /></div><div className="flex items-start gap-3 text-sm leading-6 text-muted"><input id="consent" type="checkbox" className="mt-1" /><label htmlFor="consent">我愿意将这篇记录保存为个人记忆。<span className="block text-xs">授权与保存逻辑尚未实现，本选项仅展示未来流程。</span></label></div><button className="disabled-button" type="button" disabled>保存记录 · 尚未开放</button></fieldset><p id="journal-status" className="mt-4 text-xs leading-6 text-muted">表单暂不可输入或提交，避免误以为内容已被保存。</p></Card><Card><p className="eyebrow">一点记录灵感</p><h2 className="mt-3 text-xl font-semibold">不必写得很完整</h2><ul className="mt-6 space-y-5 text-sm leading-7 text-muted"><li>今天，什么让你停下了脚步？</li><li>有没有一句话，想留给未来的自己？</li><li>最近的一次小小进步是什么？</li></ul><div className="mt-8 border-t border-line pt-5"><h3 className="text-sm font-semibold">未来的保存边界</h3><p className="mt-2 text-sm leading-7 text-muted">生活记录与个人记忆将区分管理。只有你明确选择保存的内容，才会进入记忆流程。</p></div></Card></div><div className="mt-5"><PhaseNotice /></div></>;
+export default async function JournalPage() {
+  const state = await accountState();
+  return (
+    <>
+      <PageHeading
+        eyebrow="LIFE, ONE MOMENT AT A TIME"
+        title="把生活，轻轻写下来"
+        description="一次散步、一顿晚餐、一个新的决定。先保存给自己，再决定是否单独授权小栖记住。"
+      />
+      {state.kind === "authenticated" ? (
+        <SessionBoundary key={state.userId} userId={state.userId}>
+          <div className="grid gap-5 md:grid-cols-[1.5fr_1fr]">
+            <EntryEditor key={state.userId} />
+            <Card>
+              <p className="eyebrow">一点记录灵感</p>
+              <h2 className="mt-3 text-xl font-semibold">不必写得很完整</h2>
+              <ul className="mt-6 space-y-5 text-sm leading-7 text-muted">
+                <li>今天，什么让你停下了脚步？</li>
+                <li>有没有一句话，想留给未来的自己？</li>
+                <li>最近的一次小小进步是什么？</li>
+              </ul>
+              <p className="mt-6 border-t border-line pt-5 text-sm leading-7 text-muted">
+                私人保存不需要 AI
+                授权。标题可空；成功后可在详情编辑、删除或逐条授权角色摘要。未保存草稿只留在当前页面。
+              </p>
+            </Card>
+          </div>
+        </SessionBoundary>
+      ) : (
+        <AccessGate state={state} returnTo="/journal" />
+      )}
+    </>
+  );
 }
