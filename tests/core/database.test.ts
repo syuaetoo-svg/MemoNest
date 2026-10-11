@@ -376,6 +376,22 @@ test("B2 PostgreSQL migration and permission contracts", async (t) => {
     },
   );
   await t.test(
+    "read-only deployment metadata check detects missing maintenance and disabled RLS",
+    async () => {
+      await db.exec("reset role");
+      const sql = await readFile(new URL("../../supabase/verify.sql", import.meta.url), "utf8");
+      const initial = await db.query<{ check_name: string; passed: boolean }>(sql);
+      assert.equal(initial.rows.length, 13);
+      assert.deepEqual(initial.rows.filter((row) => !row.passed).map((row) => row.check_name), ["function/public.mn_purge_expired_metadata()"]);
+      await db.exec(await readFile(new URL("../../supabase/maintenance.sql", import.meta.url), "utf8"));
+      assert.ok((await db.query<{ passed: boolean }>(sql)).rows.every((row) => row.passed));
+      await db.exec("begin; alter table public.journal_entries disable row level security");
+      const altered = await db.query<{ check_name: string; passed: boolean }>(sql);
+      assert.equal(altered.rows.find((row) => row.check_name === "table/journal_entries")?.passed, false);
+      await db.exec("rollback");
+    },
+  );
+  await t.test(
     "administrator retention cleanup is not client callable and does not remove live records",
     async () => {
       await db.exec("reset role");

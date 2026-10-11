@@ -35,6 +35,8 @@ npm run dev
 
 ### 托管 Supabase（实际使用前必需）
 
+项目已有 Supabase SDK、Auth 和真实数据库接口；接入现有真实项目请先阅读 [接入与验收指南](docs/SUPABASE_SETUP.md)，包含官方环境变量映射、只读连接探测、迁移核查与两用户验收步骤。不要直接覆盖客户端或复制 todos 示例。
+
 1. 创建自己的 Supabase 项目，选择适合数据所在地的区域。在项目 API 设置读取 URL 和 publishable key（旧 anon key 也支持）。在 `.env.local` 或部署平台安全设置填写，**不要将值发到聊天或提交 Git**。
 2. 在新项目 SQL Editor 按顺序执行 [核心迁移](supabase/migrations/202610110001_core.sql)、[清理运维函数](supabase/maintenance.sql)。已应用的迁移不要重复执行。已有 CLI 关联项目可以使用 `supabase db push`，先核对目标项目，不用 reset 覆盖现有数据库。
 3. 在 Authentication 启用 Email/Password 和邮箱确认；配置自己控制的 SMTP、Site URL 为 APP_URL、Redirect URLs 包含 `APP_URL/auth/confirm`。Sign up 邮件模板使用下面的 token-hash 链接；缺少 SMTP/确认模板不能宣称邮件注册闭环可用。
@@ -78,6 +80,8 @@ npm run start
 ```
 
 `lint` 不允许警告，`typecheck` 开启 TypeScript 严格检查，`build` 验证生产构建。核心测试分为输入/组件契约、PostgreSQL 权限、未配置页面和真实服务 E2E。每层验证范围不同，不以构建通过替代真实持久化验收。
+
+配置真实项目后可运行 `npm run supabase:check`（Node.js 24）：仅做有时限的只读 Auth/匿名拒绝探测，缺失配置或连接失败返回非零，不输出凭据。管理员另在 SQL Editor 运行 [verify.sql](supabase/verify.sql) 核查迁移元数据。通过探测不代表登录、行级隔离或持久化已验收。
 
 安装提示：当前 Next.js ESLint 插件链的 peer dependency 范围仍限定 ESLint 9，因此暂使用兼容的 9.39.5。npm 会提示该版本已停止维护；待插件链支持 ESLint 10 后再整体升级，避免强制忽略依赖兼容性。
 
@@ -175,6 +179,7 @@ tests/core-browser/        # 未配置验证 / 显式真实本地 E2E
 | [数据模型](docs/DATA_MODEL.md) | 私人 JournalEntry 与授权 Memory/MemoryConsent 分离 |
 | [AI 工作流](docs/AI_WORKFLOW.md) | 提取候选不自动保存、逐条授权、受限召回与技术测试计划 |
 | [B2 核心全栈说明](docs/CORE_FULLSTACK.md) | 实际代码范围、API、权限与验收边界 |
+| [真实 Supabase 接入](docs/SUPABASE_SETUP.md) | 环境配置、只读探测、迁移核查、托管项目验收与阻塞 |
 | [可用性测试主持指南](docs/USABILITY_TEST_GUIDE.md) | B1 原型入口、同意、顺序、任务、采集口径与空白观察模板 |
 
 主要取舍：手写和聊天是平行入口；自动弹窗只进入研究，轻量卡片要通过测试才启用，主动整理始终保留；回顾先证明能找回原文，再考虑 AI 故事。私人保存不等于授权角色长期记住，私人内容在用户发起单次 AI 处理时另行说明范围。
