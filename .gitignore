@@ -13,3 +13,7 @@ npm-debug.log*
 # Playwright generated artifacts (may include test screenshots)
 /test-results/
 /playwright-report/
+
+# Supabase CLI local state (may contain generated credentials)
+/supabase/.temp/
+/supabase/.branches/
