@@ -13,7 +13,8 @@
     "test:core:browser": "playwright test --config playwright.core.config.ts",
     "test:core:live": "CORE_E2E=1 playwright test --config playwright.core.config.ts",
     "test:server": "node --conditions=react-server --import tsx --test tests/server/*.test.ts tests/ai/*.test.ts",
-    "supabase:check": "node --use-env-proxy --conditions=react-server --import tsx scripts/check-supabase.ts"
+    "supabase:check": "node --use-env-proxy --conditions=react-server --import tsx scripts/check-supabase.ts",
+    "test:ai:live": "node --use-env-proxy --conditions=react-server --import tsx scripts/check-groq.ts"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.7",

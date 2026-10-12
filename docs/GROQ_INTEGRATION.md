@@ -49,3 +49,54 @@ Do not mark live deployment or the two-account RLS checks complete until actuall
 - [ ] Production deployment and mobile acceptance tests
 
 Do not commit secrets, publish a demo URL before deployment, or mark these outstanding checks complete without evidence.
+
+## 2026-10-12 Responses contract follow-up (after PR #11)
+
+Inspected base `82a0cea`; PR #11 added diagnostics, not a confirmed live fix.
+Its main Quality run `38234551689` passed. No open PRs existed at inspection.
+
+Confirmed compatibility defect: `GROQ_MODEL` accepted arbitrary models, while
+`generate` always sent `text.format.type=json_schema, strict=true`. Groq documents
+strict support for GPT OSS 20B/120B and Qwen 3.8 27B, not e.g. Llama 3.3 70B.
+Other models now receive JSON Object mode with explicit schema instructions.
+All modes retain the original Zod length/cardinality checks and route-level
+source/citation validation. This is not a claim that the reported 503 used Llama;
+the original request's model/status is unavailable here.
+
+GPT OSS requests now set `reasoning.effort=low` to reduce reasoning pressure on
+the existing 3500-token output budget. This mitigates a possible incomplete
+response; no live measurement proves it caused the reported failure.
+The default model remains GPT OSS 20B. There is no retry or paid-provider fallback.
+
+Raw REST parsing uses `output[].content[].text`, not SDK-only `output_text`.
+Reasoning items are ignored. Refusals, incomplete messages, malformed envelopes,
+invalid JSON and schema violations fail closed with distinct safe log categories.
+Keys, response bodies, prompts and generated content are never logged.
+The existing `store:false`, timeout and response-size limits remain in place.
+
+### Verification in the cloud workspace
+
+- Service tests: 33 passed, including Groq transport fixtures for chat/draft/review.
+- Core tests: 21 passed (UI mocks + isolated PGlite; no hosted migration applied).
+- Lint, TypeScript and production build: passed (25 routes).
+- `npm run test:ai:live`: actually executed; exited 2 with
+  `GROQ_RUNTIME_CREDENTIAL_UNAVAILABLE`. No authenticated Groq request was made.
+- Real Groq replies, deployed login/database flows and saving generated drafts:
+  **not yet verified**. Existing CI success is not live model evidence.
+
+### Reusable real-provider acceptance
+
+`npm run test:ai:live` invokes production chat/draft/review handlers, prompts,
+provider transport, response parser and evidence checks with synthetic records.
+It makes at most three Groq calls, stopping on first failure. Authentication and
+record lookup are fixtures; it never accesses user records or writes a database.
+Success therefore proves provider integration, not deployed browser E2E.
+It requires runtime-injected credentials, never loads secret files, prints only
+stage/status/safe error codes, and exits nonzero on missing credentials/failure.
+
+A manual-only `Groq live provider smoke` Actions workflow runs the same command
+using the repository's encrypted `GROQ_API_KEY` secret and optional `GROQ_MODEL`
+variable. It does not run on pull requests or ordinary pushes, and does not expose
+secrets to normal tests. This workflow was not dispatched in this session; this
+connection has no workflow-dispatch capability. No credential rotation or Windows
+restart is a prerequisite for reviewing the code fix.
