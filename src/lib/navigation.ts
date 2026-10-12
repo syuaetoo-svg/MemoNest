@@ -3,4 +3,5 @@ export const navigation = [
   { href: "/chat", label: "角色聊天", icon: "chat" },
   { href: "/journal", label: "生活记录", icon: "journal" },
   { href: "/memories", label: "记忆管理", icon: "memories" },
+  { href: "/review", label: "生活回顾", icon: "memories" },
 ] as const;

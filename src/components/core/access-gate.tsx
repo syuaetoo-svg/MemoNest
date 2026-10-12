@@ -20,7 +20,7 @@ export function AccessGate({
       </h2>
       <p className="my-4 text-sm leading-7 text-muted">
         {state.kind === "unconfigured"
-          ? "真实认证与数据库尚未配置。请按 README 设置 Supabase 并执行迁移；这里没有假登录或本地保存。"
+          ? "真实认证与数据库尚未配置。请按 README 设置 Supabase 并核查已有迁移；这里没有假登录或本地保存。"
           : state.kind === "unavailable"
             ? "认证服务暂不可用，没有读取或保存你的私人内容。请稍后重试。"
             : "生活记录属于你的账号；保存私人记录不会默认授权小栖使用。"}

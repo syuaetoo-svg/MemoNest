@@ -80,8 +80,8 @@ export function MemoryPermission({ entry }: { entry: Entry }) {
     <Card>
       <h2 className="text-xl font-semibold">小栖的角色记忆</h2>
       <p className="my-4 text-sm leading-7 text-muted">
-        私人记录与长期记忆是两件事。目前没有接入
-        AI；这里只管理未来可供小栖使用的授权范围。
+        私人记录与长期记忆是两件事。这里只管理未来可供小栖使用的授权范围；
+        单篇 AI 回顾需要另外同意当次处理，不会改变这里的授权。
       </p>
       {loading && <p role="status">正在检查授权状态…</p>}
       <Feedback message={error} error />

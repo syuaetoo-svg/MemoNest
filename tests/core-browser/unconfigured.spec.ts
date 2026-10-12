@@ -2,7 +2,7 @@ import { test, expect } from "@playwright/test";
 test("missing services show honest guidance and preserve formal routes/UX lab", async ({
   page,
 }) => {
-  for (const path of ["/account", "/journal", "/memories"]) {
+  for (const path of ["/account", "/journal", "/memories", "/chat", "/review"]) {
     await page.goto(path);
     await expect(
       page.getByRole("heading", { name: "连接你的小屋之前" }),
@@ -17,8 +17,8 @@ test("missing services show honest guidance and preserve formal routes/UX lab", 
       ),
     ).toBe(true);
   }
-  await page.goto("/chat");
-  await expect(page.getByRole("button", { name: "发送消息" })).toBeDisabled();
+  await page.goto("/privacy");
+  await expect(page.getByRole("heading", { name: "记录与记忆，由你决定" })).toBeVisible();
   await page.goto("/ux-lab");
   await expect(page.getByRole("link", { name: /传统手动记录/ })).toBeVisible();
   await page.goto("/");
@@ -46,6 +46,10 @@ test("unconfigured API never pretends persistence/auth; cross-origin writes reje
   });
   expect(rejected.status()).toBe(403);
   for (const path of [
+    "/api/ai/chat",
+    "/api/ai/draft",
+    "/api/ai/review",
+    "/api/ai/period-review",
     "/api/auth/signup",
     "/api/auth/login",
     "/api/journal-entries",

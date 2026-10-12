@@ -35,14 +35,15 @@ test("core component recovery and separate permission controls", async (t) => {
     this.removeAttribute("open");
   };
   const originalFetch = globalThis.fetch;
-  const { render, fireEvent, waitFor, cleanup } =
+  const { render, fireEvent, waitFor, cleanup, act } =
     await import("@testing-library/react");
-  const { EntryEditor } = await import("../../src/components/core/journal");
+  const { EntryEditor, JournalTimeline } = await import("../../src/components/core/journal");
   const { MemoryPermission } =
     await import("../../src/components/core/memories");
   const { SessionBoundary } =
     await import("../../src/components/core/session-boundary");
   const { IdentityContext } = await import("../../src/lib/core/client");
+  const { JournalReview } = await import("../../src/components/core/journal-review");
   const userId = randomUUID(),
     id = randomUUID();
   const entry = {
@@ -56,6 +57,77 @@ test("core component recovery and separate permission controls", async (t) => {
     updated_at: "2026-01-01T00:00:00Z",
   };
   try {
+    await t.test("AI review requires separate consent, reports failure and discards cancelled late output", async () => {
+      let calls = 0;
+      let complete!: (response: Response) => void;
+      const pending = new Promise<Response>((resolve) => { complete = resolve; });
+      globalThis.fetch = async (_url, options) => {
+        calls++;
+        const input = JSON.parse(options?.body as string);
+        assert.deepEqual(input, { entryId: entry.id, expectedVersion: 1, processingConsent: true });
+        assert.equal(new Headers(options?.headers).get("X-MemoNest-User"), userId);
+        if (calls === 1) return Response.json({ error: { code: "AI_NOT_CONFIGURED", message: "AI 回顾尚未配置" } }, { status: 503 });
+        return pending;
+      };
+      const view = render(<IdentityContext value={userId}><JournalReview entry={entry} /></IdentityContext>);
+      const consent = view.getByRole("checkbox") as HTMLInputElement;
+      assert.equal(consent.checked, false);
+      assert.equal((view.getByRole("button", { name: "生成本次回顾" }) as HTMLButtonElement).disabled, true);
+      assert.equal(calls, 0);
+      fireEvent.click(consent);
+      fireEvent.click(view.getByRole("button", { name: "生成本次回顾" }));
+      await waitFor(() => assert.ok(view.getByText("AI 回顾尚未配置")));
+      assert.equal(consent.checked, false);
+      fireEvent.click(consent);
+      fireEvent.click(view.getByRole("button", { name: "生成本次回顾" }));
+      fireEvent.click(view.getByRole("button", { name: "停止回顾" }));
+      await act(async () => {
+        complete(Response.json({ moments: [{ text: "late result must not appear", quote: entry.body }],
+          source: { id: entry.id, version: 1, title: "", eventDate: entry.event_date } }));
+        await pending;
+      });
+      assert.equal(view.queryByText("late result must not appear"), null);
+      assert.equal(consent.checked, false);
+      assert.equal(dom.window.localStorage.length, 0);
+      assert.equal(entry.body, "fictional source");
+      cleanup();
+    });
+    for (const failure of [false, true]) {
+      await t.test(
+        `keyword search ignores an old pagination ${failure ? "failure" : "success"}`,
+        async () => {
+          let complete!: (response: Response) => void;
+          const pending = new Promise<Response>((resolve) => { complete = resolve; });
+          globalThis.fetch = async (url) => {
+            const path = String(url);
+            if (path.includes("cursor=")) return pending;
+            const filtered = path.includes("q=walk");
+            return Response.json({
+              entries: [{ ...entry, title: filtered ? "walk result" : "initial result" }],
+              nextCursor: filtered ? "new-cursor" : "old-cursor",
+            });
+          };
+          const view = render(<IdentityContext value={userId}><JournalTimeline /></IdentityContext>);
+          await waitFor(() => assert.ok(view.getByText("initial result")));
+          fireEvent.click(view.getByRole("button", { name: "加载更早的记录" }));
+          assert.ok(view.getByRole("button", { name: "正在加载…" }));
+          fireEvent.change(view.getByRole("textbox", { name: "原文关键词" }), { target: { value: "walk" } });
+          fireEvent.click(view.getByRole("button", { name: "查找" }));
+          await waitFor(() => assert.ok(view.getByText("walk result")));
+          assert.equal((view.getByRole("button", { name: "加载更早的记录" }) as HTMLButtonElement).disabled, false);
+          await act(async () => {
+            complete(failure
+              ? Response.json({ error: { code: "SERVICE_ERROR", message: "stale pagination error" } }, { status: 503 })
+              : Response.json({ entries: [{ ...entry, id: randomUUID(), title: "stale pagination result" }], nextCursor: null }));
+            await pending;
+          });
+          assert.equal(view.queryByText("stale pagination result"), null);
+          assert.equal(view.queryByText("stale pagination error"), null);
+          assert.ok(view.getByRole("button", { name: "加载更早的记录" }));
+          cleanup();
+        },
+      );
+    }
     await t.test(
       "failed save retains editable draft and retries the same request ID",
       async () => {

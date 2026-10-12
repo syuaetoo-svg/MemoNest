@@ -21,6 +21,7 @@ export async function api<T>(
   method = "GET",
   data?: unknown,
   expectedUserId?: string | null,
+  signal?: AbortSignal,
 ): Promise<T> {
   let response: Response;
   try {
@@ -28,6 +29,7 @@ export async function api<T>(
       method,
       cache: "no-store",
       credentials: "same-origin",
+      signal,
       headers: {
         ...(data === undefined ? {} : { "Content-Type": "application/json" }),
         ...(expectedUserId ? { "X-MemoNest-User": expectedUserId } : {}),
@@ -63,8 +65,8 @@ export const IdentityContext = createContext<string | null>(null);
 export function useCoreApi() {
   const identity = useContext(IdentityContext);
   return useCallback(
-    <T>(path: string, method = "GET", data?: unknown) =>
-      api<T>(path, method, data, identity),
+    <T>(path: string, method = "GET", data?: unknown, signal?: AbortSignal) =>
+      api<T>(path, method, data, identity, signal),
     [identity],
   );
 }

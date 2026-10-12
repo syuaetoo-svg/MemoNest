@@ -9,10 +9,10 @@
     "lint": "eslint . --max-warnings=0",
     "typecheck": "tsc --noEmit",
     "test:ux": "playwright test",
-    "test:core": "tsx --test tests/core/*.test.ts tests/core/*.test.tsx",
+    "test:core": "node --import tsx --test tests/core/*.test.ts tests/core/*.test.tsx",
     "test:core:browser": "playwright test --config playwright.core.config.ts",
     "test:core:live": "CORE_E2E=1 playwright test --config playwright.core.config.ts",
-    "test:server": "tsx --conditions=react-server --test tests/server/*.test.ts",
+    "test:server": "node --conditions=react-server --import tsx --test tests/server/*.test.ts tests/ai/*.test.ts",
     "supabase:check": "node --use-env-proxy --conditions=react-server --import tsx scripts/check-supabase.ts"
   },
   "dependencies": {

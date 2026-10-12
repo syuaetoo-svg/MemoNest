@@ -15,7 +15,7 @@ export function FeatureLink({ href, title, description, children }: { href: stri
 }
 
 export function PhaseNotice() {
-  return <p className="flex items-start gap-2 rounded-2xl bg-paper px-4 py-3 text-sm leading-6 text-muted"><LockKeyhole size={16} className="mt-1 shrink-0" aria-hidden="true" />AI 对话与智能回顾尚未开放。你可以直接记录生活，私人保存与角色授权分别管理。</p>;
+  return <p className="flex items-start gap-2 rounded-2xl bg-paper px-4 py-3 text-sm leading-6 text-muted"><LockKeyhole size={16} className="mt-1 shrink-0" aria-hidden="true" />你可以直接记录生活，或在同意当次处理后使用 AI。私人保存与角色授权分别管理。</p>;
 }
 
 export function EmptyState({ title, description }: { title: string; description: string }) {

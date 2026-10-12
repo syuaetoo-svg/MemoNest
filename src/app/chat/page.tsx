@@ -1,8 +1,28 @@
 import type { Metadata } from "next";
-import { Leaf, MessageCircle } from "lucide-react";
-import { Card, EmptyState, PageHeading, PhaseNotice } from "@/components/ui";
-
-export const metadata: Metadata = { title: "角色聊天" };
-export default function ChatPage() {
-  return <><PageHeading eyebrow="A LITTLE COMPANY" title="和小栖，慢慢聊" description="不必组织好语言，也不必每一天都很精彩。这里将成为一个可以安心分享生活的地方。" /><div className="grid gap-5 md:grid-cols-[280px_1fr]"><Card><div className="mb-5 flex h-20 w-20 items-center justify-center rounded-3xl bg-sage-light text-sage-dark"><Leaf size={38} strokeWidth={1.3} aria-hidden="true" /></div><p className="eyebrow">原创角色 / 设定预览</p><h2 className="mt-3 text-2xl font-semibold">小栖</h2><p className="mt-2 text-sm text-sage-dark">温柔倾听，保留你的节奏。</p><p className="mt-5 text-sm leading-7 text-muted">小栖是记忆小屋的原创 AI 伙伴。它的设计目标是陪你梳理日常，帮助你发现值得记录的片刻。</p><p className="mt-6 rounded-xl bg-paper p-3 text-xs leading-6 text-muted">角色尚未接入 AI。未来的回复由 AI 生成，陪伴不替代专业心理或医疗支持。</p></Card><Card className="flex flex-col"><div className="flex items-center gap-2 border-b border-line pb-4 text-sm font-medium"><MessageCircle size={18} aria-hidden="true" />对话空间<span className="ml-auto text-xs text-muted">尚未开放</span></div><EmptyState title="第一次对话，从这里开始" description="接入 AI 后，你可以在这里和小栖交流。当前没有模拟回复，也没有保存任何聊天记录。" /><div className="mt-auto"><label htmlFor="message" className="mb-2 block text-sm font-medium">想对小栖说的话</label><textarea id="message" disabled rows={2} placeholder="AI 对话将在后续阶段开放" aria-describedby="chat-status" className="w-full resize-none rounded-xl border border-line bg-paper p-4 text-sm disabled:cursor-not-allowed" /><div className="mt-3 flex flex-wrap items-center justify-between gap-3"><p id="chat-status" className="text-xs text-muted">发送已禁用：尚未接入 AI 服务。</p><button disabled className="disabled-button">发送消息</button></div></div></Card></div><div className="mt-5"><PhaseNotice /></div></>;
+import { PageHeading } from "@/components/ui";
+import { ChatWorkspace } from "@/components/core/ai";
+import { AccessGate } from "@/components/core/access-gate";
+import { SessionBoundary } from "@/components/core/session-boundary";
+import { accountState } from "@/lib/server/supabase";
+import { aiConfigured } from "@/lib/server/ai-provider";
+export const dynamic = "force-dynamic";
+export const metadata: Metadata = { title: "和小栖聊聊" };
+export default async function ChatPage() {
+  const state = await accountState();
+  return (
+    <>
+      <PageHeading
+        eyebrow="A LITTLE COMPANY"
+        title="和小栖，慢慢聊"
+        description="不必组织好语言。聊聊今天，再把想留下的片刻，变成属于自己的生活记录。"
+      />
+      {state.kind === "authenticated" ? (
+        <SessionBoundary key={state.userId} userId={state.userId}>
+          <ChatWorkspace configured={aiConfigured()} />
+        </SessionBoundary>
+      ) : (
+        <AccessGate state={state} returnTo="/chat" />
+      )}
+    </>
+  );
 }
