@@ -1,6 +1,7 @@
 import "server-only";
 import { z } from "zod";
 import { ApiError } from "./http";
+import { resolveAiProvider } from "./ai-provider-config";
 
 export function aiConfigured() {
   return resolveAiProvider(process.env) !== null;
