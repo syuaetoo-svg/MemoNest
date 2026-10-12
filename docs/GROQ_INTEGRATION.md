@@ -9,6 +9,14 @@ MemoNest's AI server supports Groq-first and OpenAI-compatible Responses API req
 - A configured Groq provider should be preferred over OpenAI, without silently falling back to paid OpenAI calls on errors.
 - Configure the key in local `.env.local` or deployment environment secrets, not GitHub source.
 
+## Windows local development
+
+Use Node.js 24 and `npm run dev`. When Windows has an enabled local HTTP proxy, the development launcher passes it to Node's environment proxy support; localhost requests bypass the proxy. Without an enabled proxy, the ordinary connection is retained. Other platforms use the normal Next.js development command.
+
+This fixes cases where the browser can reach Groq through the configured Windows proxy but Node's direct requests receive 403. The launcher supports loopback HTTP proxies only, never prints proxy settings or secrets, and does not modify `.env.local`. Production hosting and `npm run start` require their own network configuration.
+
+HTTP 401, HTTP 403, connection failures and invalid generated output are reported separately. A generic 403 alone does not prove an invalid key or a specific regional restriction.
+
 ## Acceptance criteria
 
 1. Existing OpenAI behavior remains unchanged if Groq is not configured.
