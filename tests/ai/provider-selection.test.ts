@@ -29,3 +29,30 @@ test("existing OpenAI configuration remains supported", () => {
   assert.equal(config?.url, "https://api.openai.com/v1/responses");
   assert.equal(config?.model, "gpt-4.1-mini");
 });
+
+
+test("blank Groq key does not override a valid OpenAI configuration", () => {
+  const config = resolveAiProvider({
+    GROQ_API_KEY: "  ",
+    OPENAI_API_KEY: "openai-secret",
+    OPENAI_MODEL: "gpt-4.1-mini",
+  });
+  assert.equal(config?.provider, "openai");
+});
+
+test("an OpenAI key without a model never creates an implicit paid request", () => {
+  assert.equal(resolveAiProvider({ OPENAI_API_KEY: "openai-secret" }), null);
+});
+
+test("blank Groq model uses the known free-tier-compatible default", () => {
+  const config = resolveAiProvider({ GROQ_API_KEY: "groq-secret", GROQ_MODEL: "  " });
+  assert.equal(config?.model, "openai/gpt-oss-20b");
+});
+
+test("Groq is still selected when OpenAI is only partially configured", () => {
+  const config = resolveAiProvider({
+    GROQ_API_KEY: "groq-secret",
+    OPENAI_API_KEY: "openai-secret",
+  });
+  assert.equal(config?.provider, "groq");
+});
