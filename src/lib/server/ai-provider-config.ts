@@ -6,7 +6,7 @@ export type AiProviderConfig = {
   provider: "groq" | "openai";
 };
 
-export function resolveAiProvider(env: NodeJS.ProcessEnv): AiProviderConfig | null {
+export function resolveAiProvider(env: Record<string, string | undefined>): AiProviderConfig | null {
   const groqKey = env.GROQ_API_KEY?.trim();
   if (groqKey) return {
     url: "https://api.groq.com/openai/v1/responses",
