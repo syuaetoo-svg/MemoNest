@@ -2,23 +2,8 @@ import "server-only";
 import { z } from "zod";
 import { ApiError } from "./http";
 
-function providerConfig() {
-  // Groq is explicitly preferred; failures never trigger a paid OpenAI fallback.
-  if (process.env.GROQ_API_KEY?.trim()) return {
-    url: "https://api.groq.com/openai/v1/responses",
-    key: process.env.GROQ_API_KEY.trim(),
-    model: process.env.GROQ_MODEL?.trim() || "openai/gpt-oss-20b",
-  };
-  if (process.env.OPENAI_API_KEY?.trim() && process.env.OPENAI_MODEL?.trim()) return {
-    url: "https://api.openai.com/v1/responses",
-    key: process.env.OPENAI_API_KEY.trim(),
-    model: process.env.OPENAI_MODEL.trim(),
-  };
-  return null;
-}
-
 export function aiConfigured() {
-  return providerConfig() !== null;
+  return resolveAiProvider(process.env) !== null;
 }
 export async function generate<T>(
   instructions: string,
@@ -32,7 +17,7 @@ export async function generate<T>(
       "AI_NOT_CONFIGURED",
       "小栖暂未连接模型服务。你仍可以直接记录生活。",
     );
-  const config = providerConfig()!;
+  const config = resolveAiProvider(process.env)!;
   const timeout = AbortSignal.timeout(45000);
   try {
     const response = await fetch(config.url, {
