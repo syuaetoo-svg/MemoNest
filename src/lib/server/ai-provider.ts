@@ -47,11 +47,21 @@ export async function generate<T>(
       }),
     });
     if (!response.ok) {
-      // Never relay upstream bodies: they can contain inputs, account details or secrets.
+      // Log only safe metadata; never log bodies, prompts, keys or headers.
+      console.error("[ai-provider] upstream failure", {
+        provider: config.provider,
+        status: response.status,
+      });
+      const limited = response.status === 429;
+      const badRequest = response.status === 400 || response.status === 422;
+      const authFailure = response.status === 401 || response.status === 403;
       throw new ApiError(
-        response.status === 429 ? 429 : 503,
-        "AI_UNAVAILABLE",
-        "模型服务暂不可用，请稍后重试。内容没有自动保存。",
+        limited ? 429 : 503,
+        limited ? "AI_RATE_LIMIT" : badRequest ? "AI_BAD_REQUEST" : authFailure ? "AI_AUTH_FAILED" : "AI_UNAVAILABLE",
+        limited ? "模型请求达到限额，请稍后重试。" :
+          badRequest ? "模型请求格式未被服务商接受，请检查服务端请求结构。" :
+          authFailure ? "模型服务认证失败，请检查密钥权限。" :
+          "模型服务暂不可用，请稍后重试。内容没有自动保存。",
       );
     }
     const reader = response.body?.getReader();
@@ -85,6 +95,11 @@ export async function generate<T>(
     return result.data;
   } catch (error) {
     if (error instanceof ApiError) throw error;
+    console.error("[ai-provider] response processing failed", {
+      provider: config.provider,
+      category: error instanceof SyntaxError ? "invalid_json" :
+        error instanceof Error && error.name === "TimeoutError" ? "timeout" : "processing_error",
+    });
     throw new ApiError(
       503,
       "AI_GENERATION_FAILED",
