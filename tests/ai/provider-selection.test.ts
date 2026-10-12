@@ -1,6 +1,6 @@
 import { strict as assert } from "node:assert";
 import { test } from "node:test";
-import { resolveAiProvider } from "../../src/lib/server/ai-provider-config";
+import { resolveAiProvider, classifyAiUpstreamStatus } from "../../src/lib/server/ai-provider-config";
 
 test("no configured provider means no AI calls", () => {
   assert.equal(resolveAiProvider({}), null);
@@ -55,4 +55,12 @@ test("Groq is still selected when OpenAI is only partially configured", () => {
     OPENAI_API_KEY: "openai-secret",
   });
   assert.equal(config?.provider, "groq");
+});
+
+test("upstream errors are classified without leaking response content", () => {
+  assert.deepEqual([400, 401, 403, 422, 429, 500].map((status) => classifyAiUpstreamStatus(status).code), [
+    "AI_BAD_REQUEST", "AI_AUTH_FAILED", "AI_AUTH_FAILED", "AI_BAD_REQUEST", "AI_RATE_LIMIT", "AI_UNAVAILABLE",
+  ]);
+  assert.equal(classifyAiUpstreamStatus(429).status, 429);
+  assert.equal(classifyAiUpstreamStatus(401).status, 503);
 });
