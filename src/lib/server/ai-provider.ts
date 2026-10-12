@@ -1,7 +1,7 @@
 import "server-only";
 import { z } from "zod";
 import { ApiError } from "./http";
-import { resolveAiProvider } from "./ai-provider-config";
+import { resolveAiProvider, classifyAiUpstreamStatus } from "./ai-provider-config";
 
 export function aiConfigured() {
   return resolveAiProvider(process.env) !== null;
@@ -52,17 +52,8 @@ export async function generate<T>(
         provider: config.provider,
         status: response.status,
       });
-      const limited = response.status === 429;
-      const badRequest = response.status === 400 || response.status === 422;
-      const authFailure = response.status === 401 || response.status === 403;
-      throw new ApiError(
-        limited ? 429 : 503,
-        limited ? "AI_RATE_LIMIT" : badRequest ? "AI_BAD_REQUEST" : authFailure ? "AI_AUTH_FAILED" : "AI_UNAVAILABLE",
-        limited ? "模型请求达到限额，请稍后重试。" :
-          badRequest ? "模型请求格式未被服务商接受，请检查服务端请求结构。" :
-          authFailure ? "模型服务认证失败，请检查密钥权限。" :
-          "模型服务暂不可用，请稍后重试。内容没有自动保存。",
-      );
+      const failure = classifyAiUpstreamStatus(response.status);
+      throw new ApiError(failure.status, failure.code, failure.message);
     }
     const reader = response.body?.getReader();
     if (!reader) throw new Error("empty response");
