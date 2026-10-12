@@ -16,7 +16,7 @@ export default function PrivacyPage() {
           </p>
           <p>
             <strong>聊天：</strong>勾选本页处理同意后，最近 5 条用户表达及最多 3
-            条相关有效授权摘要会发送至 OpenAI。聊天不写入 MemoNest
+            条相关有效授权摘要会发送至服务端配置的 Groq 或 OpenAI。聊天不写入 MemoNest
             数据库，只留在当前页面；离开或刷新清除。过去 AI 回复不重新发送。
           </p>
           <p>
@@ -30,7 +30,7 @@ export default function PrivacyPage() {
           </p>
           <p>
             <strong>服务商处理：</strong>应用请求设置 store=false，不创建持久
-            OpenAI 对话。这不等于零保留；安全监控等保留取决于服务商和账号政策。
+            模型会话。这不等于零保留；安全监控等保留取决于服务商和账号政策。
             <a
               className="underline text-sage-dark"
               href="https://developers.openai.com/api/docs/guides/your-data"
