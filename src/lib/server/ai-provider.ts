@@ -1,7 +1,7 @@
 import "server-only";
 import { z } from "zod";
 import { ApiError } from "./http";
-import { resolveAiProvider } from "./ai-provider-config";
+import { resolveAiProvider, classifyAiUpstreamStatus } from "./ai-provider-config";
 
 export function aiConfigured() {
   return resolveAiProvider(process.env) !== null;
@@ -47,12 +47,13 @@ export async function generate<T>(
       }),
     });
     if (!response.ok) {
-      // Never relay upstream bodies: they can contain inputs, account details or secrets.
-      throw new ApiError(
-        response.status === 429 ? 429 : 503,
-        "AI_UNAVAILABLE",
-        "模型服务暂不可用，请稍后重试。内容没有自动保存。",
-      );
+      // Only safe metadata: never log prompts, keys, headers, or response bodies.
+      console.error("[ai-provider] upstream failure", {
+        provider: config.provider,
+        status: response.status,
+      });
+      const failure = classifyAiUpstreamStatus(response.status);
+      throw new ApiError(failure.status, failure.code, failure.message);
     }
     const reader = response.body?.getReader();
     if (!reader) throw new Error("empty response");
@@ -85,6 +86,11 @@ export async function generate<T>(
     return result.data;
   } catch (error) {
     if (error instanceof ApiError) throw error;
+    console.error("[ai-provider] response processing failed", {
+      provider: config.provider,
+      category: error instanceof SyntaxError ? "invalid_json" :
+        error instanceof Error && error.name === "TimeoutError" ? "timeout" : "processing_error",
+    });
     throw new ApiError(
       503,
       "AI_GENERATION_FAILED",
