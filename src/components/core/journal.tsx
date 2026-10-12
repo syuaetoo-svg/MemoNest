@@ -19,6 +19,7 @@ import {
 import { Card, EmptyState } from "@/components/ui";
 import { Button, Dialog, Feedback, fieldClass } from "./ui";
 import { MemoryPermission } from "./memories";
+import { JournalReview } from "./journal-review";
 
 export function EntryEditor({
   initial,
@@ -537,6 +538,7 @@ export function EntryDetail({ id }: { id: string }) {
         </Card>
       )}
       {!editing && <MemoryPermission entry={entry} />}
+      {!editing && <JournalReview key={`${entry.id}:${entry.version}`} entry={entry} />}
       <Dialog
         open={deleteOpen}
         title="删除这篇私人记录？"
