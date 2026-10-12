@@ -1,5 +1,7 @@
 # Groq integration
 
+> Final handoff, 2026-10-12: PR #12 is merged and its CI passed. Normally authenticated local chat returned HTTP 200 with a schema-valid real Groq reply; the project owner also confirmed local drafting/saving, period review and authorized memory reads. These observations predate the PR #12 merge and are not a claim that the complete hosted flow was rerun on the merged commit. Windows proxy startup support remains in open PR #13. The unchecked readiness items and cloud-workspace notes below are historical observations; current acceptance boundaries are recorded in [README](../README.md).
+
 MemoNest's AI server supports Groq-first and OpenAI-compatible Responses API requests. The Groq provider implementation and selection tests have been merged into `main`. Authenticated requests, explicit user consent, source/citation validation, and memory access controls remain mandatory.
 
 ## Server-only configuration

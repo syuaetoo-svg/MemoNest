@@ -1,218 +1,149 @@
 # MemoNest｜AI 角色陪伴式生活手帐
 
-AI Companion & Personal Memory Journal
+**通过对话表达生活，由自己确认记录，再决定哪些经历可以被 AI 记住。**
 
-以原创 AI 角色陪伴为入口，将用户授权保存的生活经历转化为个人记忆，并支持时间线整理与 AI 回顾。本项目用于 AI 产品经理求职作品集，按阶段建设完整产品。
+MemoNest 将原创 AI 伙伴「小栖」、生活记录整理、私人保存、授权记忆与阶段回顾串成一个产品闭环，同时保留直接手动记录入口。核心流程已通过本地真实验收；公开生产部署和真实用户研究尚未完成。
 
-## 最新增量：小栖对话、聊天整理与阶段回顾
+这是面向 AI 产品运营、AI 产品助理岗位的个人产品实践作品，展示需求拆解、交互取舍、AI 任务设计、隐私机制、技术协作与验收管理。开发使用 Codex 辅助实现、调试和测试，不将 AI 辅助代码包装成全部独立手写。
 
-本分支保留已有搜索分页修复和单篇 AI 回顾，新增真实模型接口与界面；没有新增数据库迁移。**实现代码与工程测试不等于真实服务已验收。** 本次环境没有 Supabase/OpenAI 凭据，公网部署、真实模型效果及完整托管账号闭环仍待验证。
+## 产品定位与用户问题
 
-- `/chat`：同意当次处理 → 原创小栖对话 → 选择用户原话整理 → 可编辑候选 → 确认日期及私人保存。
-- `/review`：选择最多 8 篇真实记录 → 单次全文处理同意 → 有原文引用和来源入口的阶段回顾。
-- 原有记录详情单篇回顾继续使用 `/api/ai/review`；新增多篇接口为 `/api/ai/period-review`，不替换原契约。
-- 聊天仅当前页面保存；正常角色调用只用有效授权摘要；生成前后检查来源，缺模型不提供假回复。
-- 配置服务端 `OPENAI_API_KEY` 和 `OPENAI_MODEL`；Key 不进浏览器或 GitHub。现有 Supabase 配置和迁移保持不变。
+目标用户假设：希望保留日常，但不习惯持续写长文的成年学生与初入职场者。以下问题是设计假设，未通过真实访谈或规模化使用验证。
 
-实现、设计取舍、接口、验证边界及非 Vercel 部署路径见 [本轮交付](docs/COMPANION_DELIVERY.md)。历史检查与最新结果见 [交付清单](docs/DELIVERY_CHECKLIST.md)，求职展示见 [作品说明](docs/PORTFOLIO_CASE_STUDY.md)。
+| 用户问题假设 | 产品设计回应 |
+| --- | --- |
+| 想记录，却不想从空白页组织语言 | 自然讲述后主动选择原话，让 AI 整理可编辑候选 |
+| 担心 AI 猜测被保存成事实 | 展示原话依据，用户校对正文并确认事件日期后才保存 |
+| 想保留经历，但不希望 AI 以后提起 | 私人保存与长期记忆授权分开，默认不授权 |
+| 回顾文字好看，却找不到实际经历 | 时间线与关键词检索；阶段回顾附逐字引用和来源入口 |
 
-以下为上阶段实现记录，历史“聊天禁用/尚未接入”等描述由上述最新范围更新。
+产品目标是「正确留下、找回并控制生活记录」。聊天量和授权数量不能直接证明用户价值；是否降低记录负担仍需后续对照研究。
 
-## 当前项目状态：核心全栈与单篇 AI 回顾代码，真实闭环待验收
+## 真实界面截图
 
-沿用 Next.js App Router、TypeScript、Tailwind CSS，保留原创小栖介绍、首页和独立 UX Lab。Supabase 核心迁移已由项目负责人执行，只读连接检查通过。新增单篇日记的 OpenAI 服务端回顾接口，但当前没有 API Key，未执行真实模型生成；角色聊天仍未开放。
+以下截图来自本仓库页面的实际本地运行，使用临时无登录浏览器；没有植入或修改页面结果，没有私人记录或账号信息。
 
-| 路径 | 页面 | 代码能力 |
+### 产品首页：聊天与直接记录并行
+
+![MemoNest 真实运行的产品首页](docs/screenshots/home.jpg)
+
+### 隐私说明：私人保存、单次处理与长期授权分开
+
+![MemoNest 真实运行的隐私说明页](docs/screenshots/privacy.jpg)
+
+<details>
+<summary>查看 UX Lab 的记录流程研究原型</summary>
+
+![使用虚构素材的 UX 研究原型](docs/screenshots/ux-record.jpg)
+
+这是实际运行的研究原型，使用仓库自带虚构素材、固定脚本和页面内存，不代表正式数据库保存或真实 AI 输出。没有开展真实用户研究，截图中的任务记录数也不是参与人数。
+
+</details>
+
+正式账号页面未用于公开截图，以避免展示私人经历；真实功能验收与截图展示范围分别说明。
+
+## 核心流程与能力
+
+```mermaid
+flowchart TD
+  A[正常登录] --> B{选择入口}
+  B --> C[与小栖聊天]
+  B --> D[直接手写记录]
+  C --> E[选择自己的原话]
+  E --> F[AI 整理候选]
+  F --> G[核对事实与日期]
+  D --> G
+  G --> H[确认私人保存]
+  H --> I[时间线与关键词找回]
+  H --> J[可选：授权具体记忆摘要]
+  J --> K[聊天按需召回授权摘要]
+  I --> L[选定记录并同意本次处理]
+  L --> M[阶段回顾与原文来源]
+```
+
+| 能力 | 已实现的交互与边界 |
+| --- | --- |
+| AI 角色聊天 | 小栖保持温暖、简洁，明确 AI 身份；回复可展开来源，不假装真人或制造排他关系 |
+| 生活记录整理 | 只选用户原话，候选可编辑、可放弃；日期由用户确认，不自动保存 |
+| 私人记录管理 | 输入、预览、保存、检索、编辑、删除；失败保留当前草稿，幂等重试避免重复保存 |
+| 授权记忆 | 在详情页另行确认具体摘要，可修改或撤回；普通聊天不读取全部私人记录全文 |
+| 阶段回顾 | 选择最多 8 篇记录，经单次全文处理许可后生成；提供逐字引用与来源，不自动保存或授权 |
+
+聊天是当前页面的临时、非流式交互，刷新或离开不承诺恢复完整历史。生成结束后复核来源，再展示结果。手动记录无需经过聊天或同意 AI 处理。
+
+## AI 设计与隐私机制
+
+| 许可 | 数据范围 | 结果 |
 | --- | --- | --- |
-| `/` | 小屋首页 | 产品介绍、角色与直接记录入口 |
-| `/account` | 账号 | Supabase 注册、登录、邮箱确认、退出与会话 |
-| `/chat` | 角色聊天 | 原创角色介绍；AI 发送仍禁用 |
-| `/journal` | 生活记录 | 输入、预览、真实服务端保存、失败重试、撤销入口 |
-| `/journal/:id` | 记录详情 | 读取、编辑、二次确认删除、独立摘要授权与撤回；单篇 AI 回顾需 Key 和当次处理许可 |
-| `/memories` | 记忆管理 | 私人时间线/关键词与角色记忆分区、分页和权限管理 |
-| `/ux-lab` | 研究原型 | 保留 B1 八方案，虚构数据与正式数据库隔离 |
+| 私人保存 | 用户确认的生活记录 | 保存给本人，不自动进入角色记忆 |
+| 单次 AI 处理 | 本次明确选择的原话或记录 | 内容发送给对应模型服务商，不因此获得长期授权 |
+| 长期记忆授权 | 明确确认的摘要与源记录版本 | 小栖可在后续聊天按需使用；可撤回，私人原记录保留 |
 
-**缺少服务配置时，账号与正式数据页明确显示未配置，数据接口返回 503，不提供假登录或假持久化。** 已实现的代码不代表外部 Supabase、邮件或部署已通过验收。认证/记录接口不使用 localStorage；研究员主动保存的匿名研究数据仍只在 UX Lab 独立命名空间。
+- 聊天、整理与回顾分别定义任务指令及输出契约，模型不具备保存、授权或数据库操作工具。
+- 服务端执行身份、同源、账号标记及来源版本校验；Supabase RLS 与受限 RPC 约束用户数据访问。
+- 记忆采用有效授权摘要的关键词匹配，最多召回 3 条；未命中不扫描私人全文，不宣称向量或语义检索。
+- 引用必须匹配允许的来源 ID 和逐字片段；来源或授权在生成中变化时丢弃结果。来源存在性检查不能证明概括绝无语义偏差，仍需人工校对。
+- 编辑或删除来源会使旧记忆失效；撤回不能追回已发送给服务商或已展示的内容。
+- 模型密钥只在服务端使用。请求设置 `store:false`，但这不等于服务商零保留；日志不输出私人正文、完整上游响应或密钥。
 
-最终交付边界：真实邮箱注册/登录、托管日记新增/编辑/删除/刷新持久化、双用户隔离仍待验收；现有真实 E2E 脚本仅支持本地 Supabase 自动确认账号，不能替代托管邮箱流程。没有自动关闭邮箱确认或重建数据库。Vercel 部署暂停。
+## 技术架构
 
-## 安装、配置、数据库初始化与启动
+| 层级 | 实现 |
+| --- | --- |
+| 前端 | Next.js App Router、React、TypeScript、Tailwind CSS |
+| 身份与数据 | Supabase Auth、PostgreSQL、RLS、受限 RPC；幂等操作与版本检查 |
+| AI 服务 | 新增聊天、整理、多篇回顾优先使用 Groq Responses API，支持显式 OpenAI 配置；失败不静默切换到付费服务 |
+| 输出控制 | 根据 Groq 模型能力选择严格 JSON Schema 或 JSON Object，统一执行 Zod 与来源校验，拒绝不完整、拒答及非法结果 |
+| 可靠性 | 超时、取消、响应大小上限、每用户每进程限流、生成后来源复核 |
+| 工程验证 | Node Test、组件测试、隔离 PGlite、Playwright 和 GitHub Actions |
 
-推荐 Node.js 24 LTS、npm 11。版本由 `package-lock.json` 锁定。
+旧单篇回顾保留已有 OpenAI 契约，与多篇阶段回顾是不同接口。进程内限流不能替代公开多实例部署的共享限额。
+
+## 真实验收与证据
+
+| 项目 | 当前结果 | 证据范围 |
+| --- | --- | --- |
+| 正常登录后的 AI 聊天 | 本地真实成功 | 已观察会话 HTTP 200、聊天 HTTP 200，真实 Groq 回复通过结构校验 |
+| 整理与保存、阶段回顾、授权记忆读取 | 本地验收成功 | 项目负责人已实际操作并确认；不公开私人操作内容 |
+| PR #12 | 已合并，CI 成功 | Lint、类型检查、核心/服务端测试、生产构建及核心浏览器测试通过 |
+| 产品效果与用户研究 | 尚未验证 | 没有访谈人数、留存、转化、满意度或负担改善数据 |
+| 公开部署与完整安全验收 | 待完成 | 本地验证不等于公网部署、托管双账号隔离与生产安全验收 |
+
+验收日期：2026-10-12。本地真实功能验收先于 PR #12 合并；该 PR 的云端 live smoke 曾因缺运行时凭据退出，不能算模型成功。合并后代码的工程检查与既有本地真人结果分别列示，不声称重跑了完整托管真人链路。
+
+证据：[PR #12](https://github.com/syuaetoo-svg/MemoNest/pull/12) · [PR #12 CI](https://github.com/syuaetoo-svg/MemoNest/actions/runs/38235803846)。最终文档与展示 PR 的验证结果见仓库合并记录。
+
+本地 Groq 403 曾通过「会话 → 业务接口 → 网络 → 模型请求 → 输出」分层对照定位：Node 直连与浏览器现有代理的路径不同，同一密钥和请求通过现有代理后成功。Windows 自动代理启动修复位于 [PR #13](https://github.com/syuaetoo-svg/MemoNest/pull/13)，目前尚未合并，不能声称 main 已包含该启动方式。需要代理的环境应在启动时显式配置合法、受控的 Node 网络路径。
+
+## 产品设计与运营展示
+
+- [精简 PRD](docs/PRD.md)：用户问题假设、范围、关键取舍、验收规则和指标口径。
+- [用户流程](docs/USER_FLOW.md)：聊天整理、私人保存、授权撤回和回顾的状态转换。
+- [UX 对照实验](docs/UX_EXPERIMENTS.md) 与 [研究计划](docs/USER_RESEARCH.md)：保留研究方案，明确尚无真实样本或结果。
+- [Groq 接入说明](docs/GROQ_INTEGRATION.md) 与 [Supabase 配置](docs/SUPABASE_SETUP.md)：实现与运行边界。
+
+项目展示从需求到交付的拆解能力、AI 角色/任务边界设计、权限风险识别、故障定位及证据管理。拟评估正确保存与找回、权限理解、事实支持性等指标；这些是待执行的评估口径，不是已取得的业务成果。其他阶段文档保留历史说明，当前实现以代码、本 README 和精简设计文档为准。
+
+## 本地运行
+
+推荐 Node.js 24。首次配置时在本地复制 `.env.example` 为 `.env.local`，已有文件不要覆盖。
 
 ```bash
 npm ci
-cp -n .env.example .env.local
-# 配置下面三项，并初始化数据库后启动
 npm run dev
 ```
 
-默认开发端口 3000；保留已有 `.env.local`，不要覆盖。若默认 npm 缓存不可写，使用 `npm ci --cache /tmp/memonest-npm-cache`。没有服务配置也能预览首页、角色介绍和 UX Lab。
-
-`localhost` 只指运行服务的机器：Codex 云端启动后，你电脑上的 localhost 无法直接访问。当前任务界面没有提供预览/端口转发入口，不能把云端地址当作公网链接。开发体验验证可在自己电脑检出现有仓库、单独安全配置环境变量后运行；若其他开发环境提供端口转发，则使用其真实地址并匹配 APP_URL。Vercel 部署目前暂停，不影响现有 Supabase 数据库。
-
-### 托管 Supabase（实际使用前必需）
-
-项目已有 Supabase SDK、Auth 和真实数据库接口；接入现有真实项目请先阅读 [接入与验收指南](docs/SUPABASE_SETUP.md)，包含官方环境变量映射、只读连接探测、迁移核查与两用户验收步骤。不要直接覆盖客户端或复制 todos 示例。
-
-1. 创建自己的 Supabase 项目，选择适合数据所在地的区域。在项目 API 设置读取 URL 和 publishable key（旧 anon key 也支持）。在 `.env.local` 或部署平台安全设置填写，**不要将值发到聊天或提交 Git**。
-2. 在新项目 SQL Editor 按顺序执行 [核心迁移](supabase/migrations/202610110001_core.sql)、[清理运维函数](supabase/maintenance.sql)。已应用的迁移不要重复执行。已有 CLI 关联项目可以使用 `supabase db push`，先核对目标项目，不用 reset 覆盖现有数据库。
-3. 在 Authentication 启用 Email/Password 和邮箱确认；配置自己控制的 SMTP、Site URL 为 APP_URL、Redirect URLs 包含 `APP_URL/auth/confirm`。Sign up 邮件模板使用下面的 token-hash 链接；缺少 SMTP/确认模板不能宣称邮件注册闭环可用。
-4. 设置注册速率限制与部署需要的反滥用措施。当前页面没有 CAPTCHA 集成，公开生产发布前需验证防滥用方案。
-5. 由管理员每日调度 `select public.mn_purge_expired_metadata();`（Supabase Cron/受控运维任务）。未调度就不会自动清理；备份、恢复策略与地区另行验收。
-
-```html
-<a href="{{ .RedirectTo }}?token_hash={{ .TokenHash }}&type=email">确认 MemoNest 邮箱</a>
-```
-
-| 环境变量 | 用途 |
-| --- | --- |
-| `SUPABASE_URL` | 项目 HTTPS URL，服务端读取 |
-| `SUPABASE_PUBLISHABLE_KEY` | publishable key 或旧 anon key；不接受 service_role/secret key |
-| `APP_URL` | 浏览器实际访问的 origin；用于同源校验和邮件返回，生产必填 HTTPS |
-
-本应用不需要 DATABASE_URL 或管理员数据库密钥。**没有 NEXT_PUBLIC 凭证，也不使用 service_role 绕过 RLS**。本机开发 APP_URL 可为 `.env.example` 中默认值；云端端口转发需要改成实际浏览器域名。生产使用 HTTPS。
-
-### 可选单篇 AI 回顾
-
-在忽略的 `.env.local` 或运行环境安全设置填写 `OPENAI_API_KEY`，`OPENAI_MODEL` 默认 `gpt-4.1-mini`。不要发到聊天、提交 Git 或使用 NEXT_PUBLIC 前缀。重启应用后，在已登录的日记详情页阅读 OpenAI 处理范围，主动勾选当次同意并生成回顾。缺 Key 返回明确错误，不发送日记或展示假回复。
-
-此功能只处理当前记录，最多 6000 字符、三个片刻；每段附正文原句。25 秒超时，可停止；回顾仅临时显示，刷新清除，不保存新日记或长期授权。生成后重新核查来源版本，修改/删除后丢弃结果。`store:false` 不意味着供应商零留存，供应商条款与费用需负责人核实。公开使用前还需预算及跨实例限流评估。
-
-云端调用需允许 `api.openai.com`；代理环境使用 Node.js 24 的 `NODE_USE_ENV_PROXY=1 npm run dev`，不改变本机直接联网的要求。完整 API、错误路径与未执行的效果测试见 [AI 回顾说明](docs/AI_REVIEW.md)。当前不提供真实模型成功或质量结论。
-
-### 可选真实本地 Supabase
-
-已有 Docker 和官方 Supabase CLI 时，仓库提供本地配置与迁移：
+配置服务端 `SUPABASE_URL`、`SUPABASE_PUBLISHABLE_KEY`、`APP_URL`、`GROQ_API_KEY` 与 `GROQ_MODEL`；OpenAI 使用独立配置。真实值只放本地或运行环境，禁止提交。已有数据库不要重复初始化或 reset，参考接入说明核对迁移。
 
 ```bash
-supabase start -x studio,imgproxy,storage-api,realtime,postgres-meta,logflare,vector,edge-runtime,supavisor
-# 从 CLI 本地状态安全复制 API URL 和 anon/publishable key 到 .env.local，不提交输出
-# 本地数据库首次启动应用 migrations；若已有数据库，按 CLI migration up 升级，勿盲目 reset
-npm run dev
-```
-
-`supabase/config.toml` **只用于本地开发**，关闭邮件确认以便真实本地注册自动化，不改变托管项目的邮件设置。本地库没有用户或生活记录种子，仅有原创角色小栖。服务重启由 Docker/Supabase 保留卷持久化；停止用 `supabase stop`，不要添加删除数据选项。
-
-本次云环境尝试启动真实本地服务时，镜像仓库 `public.ecr.aws` 返回 Forbidden，因此本地认证/持久化 E2E 未运行。若在该云环境继续验证，需开放官方镜像域名及其实际下载依赖，或配置可访问的托管项目域名；不要用假服务替代。
-
-## 质量检查与生产运行
-
-```bash
+npm run test:core
+npm run test:server
 npm run lint
 npm run typecheck
 npm run build
-npm run start
+npm run test:core:browser
 ```
 
-`lint` 不允许警告，`typecheck` 开启 TypeScript 严格检查，`build` 验证生产构建。核心测试分为输入/组件契约、PostgreSQL 权限、未配置页面和真实服务 E2E。每层验证范围不同，不以构建通过替代真实持久化验收。
+浏览器测试需安装 Playwright 浏览器。`npm run test:ai:live` 使用虚构材料及认证/数据库夹具，需要安全注入运行时凭据，不读取 `.env.local`，也不替代真实登录和持久化验收。
 
-配置真实项目后可运行 `npm run supabase:check`（Node.js 24）：仅做有时限的只读 Auth/匿名拒绝探测，缺失配置或连接失败返回非零，不输出凭据。管理员另在 SQL Editor 运行 [verify.sql](supabase/verify.sql) 核查迁移元数据。通过探测不代表登录、行级隔离或持久化已验收。
-
-安装提示：当前 Next.js ESLint 插件链的 peer dependency 范围仍限定 ESLint 9，因此暂使用兼容的 9.39.5。npm 会提示该版本已停止维护；待插件链支持 ESLint 10 后再整体升级，避免强制忽略依赖兼容性。
-
-## UX Lab · 可交互研究原型
-
-独立入口 `/ux-lab`，不改变正式产品页面。使用统一虚构素材、固定脚本和原型专属内存状态：
-
-| 实验 | 方案路径 | 实际交互 |
-| --- | --- | --- |
-| E1 记录方式 | `/ux-lab/e1/a`、`/ux-lab/e1/b` | 手动与脚本对话；输入、编辑、预览、私人保存 |
-| E2 保存时机 | `/ux-lab/e2/a`、`/ux-lab/e2/b`、`/ux-lab/e2/c` | 弹窗、轻提示、主动整理；忽略/放弃、保存、10 秒撤销、独立模拟授权与撤回 |
-| E3 回顾方式 | `/ux-lab/e3/a`、`/ux-lab/e3/b`、`/ux-lab/e3/c` | 时间线、主题、固定故事卡；日期/关键词、来源详情、无结果确认 |
-
-对话与故事等待固定 3 秒，**不是真实 AI，也不理解任意输入**。模拟保存只存在当前方案页面，刷新或离开丢失；无数据库、AI API、分析上传。私人保存与角色长期授权明显分开，编辑原记录使模拟旧授权失效。
-
-研究员工具支持明确开始/暂停/结束、结果分类、打扰与负担评分、单次故障演练。默认仅内存保留；可主动将匿名任务元数据保存到独立 localStorage 命名空间或导出 JSON，**不保存/导出正文、聊天、搜索词或真实身份**。匿名任务数不是参与人数。退出共享设备时清空，下载文件另行删除。
-
-请先阅读 [可用性测试主持指南](docs/USABILITY_TEST_GUIDE.md)。三组采用同一素材会产生学习效应，当前原型用于探索流程问题；未执行真实参与者研究，不宣称方案胜出或效果提升。
-
-### 原型浏览器检查
-
-```bash
-# 首次在没有浏览器的本机安装 Chromium
-npx playwright install chromium
-npm run build
-npm run test:ux
-```
-
-若环境已有系统 Chromium，可用以下方式，无需再下载：
-
-```bash
-PLAYWRIGHT_CHROMIUM_EXECUTABLE=/usr/bin/chromium npm run test:ux
-```
-
-测试配置启动生产服务到 3100 端口，需要先构建，且该端口不能被占用。包含桌面 1280px 和手机 390px 项目，以及 320px 布局边界检查；`test-results/` 和 `playwright-report/` 为忽略的生成文件。软件测试不等于参与者研究，也不是正式数据库/AI 的安全验收。
-
-## 核心测试与验收
-
-```bash
-npm run test:server       # 配置 fail-closed、CSRF、请求大小与错误脱敏
-npm run test:core         # 输入、隔离组件 mock、嵌入式 PostgreSQL 迁移/RLS/事务
-npm run build
-npm run test:core:browser # 未配置服务时的桌面/手机页面与接口拒绝
-# 仅在真实本地 Supabase 已启动、迁移已应用且 .env.local 已配置后：
-npm run test:core:live
-```
-
-浏览器首次需 `npx playwright install chromium`，或给测试命令设置 `PLAYWRIGHT_CHROMIUM_EXECUTABLE=/usr/bin/chromium`。核心浏览器配置使用 3101 端口；未配置套件主动清空服务变量，真实本地套件显式读取 .env.local、要求 localhost/127.0.0.1 Supabase，无配置则失败，不伪装通过。测试服务 APP_URL 自动设为其浏览器 origin。自动化用新建的虚构测试账号/事件，勿在生产库运行。
-
-`test:core` 中 PGlite 执行真实 PostgreSQL 引擎 SQL，但 auth.uid/users 是临时夹具；组件测试 mock 网络只验证输入保留、默认未授权和重试逻辑。两者均不证明 Supabase 登录。`test:core:live` 检查真实注册/登录/退出、刷新后读取、A/B 越权、编辑/删除、默认私人、独立授权/修改/撤回和页面交互；当前因镜像阻塞未执行。托管邮件确认、跨设备持久化、屏幕阅读器和实机软键盘仍待验收。
-
-详细接口、事务和权限范围见 [B2 全栈说明](docs/CORE_FULLSTACK.md)。
-
-## 项目结构
-
-```text
-src/app/                   # 保留首页、聊天、记录、记忆、UX Lab
-  account/                 # 真实账号入口
-  auth/confirm/            # 邮箱主动确认
-  api/                     # 同源认证、记录 CRUD、记忆授权与资格接口
-  journal/[id]/            # 记录详情
-src/components/core/       # 表单、详情、时间线、授权面板、会话边界
-src/lib/core/              # 共享运行时 schema、类型和客户端请求
-src/lib/server/            # server-only 配置、认证、服务与错误处理
-src/proxy.ts               # 正式数据页面的会话刷新，不作用于 UX Lab
-supabase/migrations/       # PostgreSQL 表、RLS、受限事务 RPC
-supabase/maintenance.sql   # 管理员 90 天失效元信息清理（需实际调度）
-tests/core/                # 契约、组件与嵌入式 PostgreSQL 测试
-tests/core-browser/        # 未配置验证 / 显式真实本地 E2E
-```
-
-## 安全与数据边界
-
-- `.env*` 忽略，仅 `.env.example` 可提交。配置值只由 server-only 模块读取。
-- Supabase Auth 管理密码；HttpOnly 会话 Cookie，生产 Secure，同源写校验、服务端 getUser 验证、RLS 与 owner 外键。
-- 业务写带当前操作用户标记并与可信会话比对，拒绝其他标签切换账号后的旧草稿；该标记不能代替认证。
-- 私人记录与 Memory/MemoryConsent 分离；授权精确摘要/来源版本/小栖范围，撤回清摘要，编辑失效，删除同事务撤回。
-- 10 秒撤销窗口由数据库校验；失败不显示成功，重复创建同请求 UUID 不重复写入，版本冲突要求重新确认。
-- 数据动态/no-store，不缓存授权上下文；AI 只在用户单次确认后处理指定日记，无全文日志或生产分析追踪。
-- 在线删除不代表备份即时擦除；有效 GRANT 与失效元信息分开保留，运维调度/备份政策须实际配置。
-
-## 产品设计文档
-
-第二阶段 A 只交付产品研究计划、交互方案与未来技术设计；未改动核心页面，未接入数据库、登录或 AI。未开展真实访谈、用户测试或 Figma 原型制作，不能把文档中的门槛当实际效果。竞品资料因网络访问受限未能核实，相关具体功能保持待验证。
-
-| 文档 | 重点 |
-| --- | --- |
-| [产品需求](docs/PRD.md) | 用户问题、假设 H1–H5、MVP 优先级、用户故事 U1–U8 与验收 |
-| [用户研究计划](docs/USER_RESEARCH.md) | 5–8 位成年人招募、访谈、观察、指标与空白记录模板 |
-| [竞品分析](docs/COMPETITOR_ANALYSIS.md) | BIMOBIMO、XinDiary 类与传统记录路径，证据边界和查证任务 |
-| [UX 实验](docs/UX_EXPERIMENTS.md) | E1 手动/对话成本、E2 保存时机 A/B/C、E3 回顾 T/G/S |
-| [用户流程](docs/USER_FLOW.md) | 角色进入、记录、确认、授权、撤销、删除与异常 |
-| [设计系统](docs/DESIGN_SYSTEM.md) | 现有 token、未来组件规范、手机优先布局、Figma 制作清单 |
-| [架构方案](docs/ARCHITECTURE.md) | 未来 Next.js、PostgreSQL、AI 服务的数据流与权限边界 |
-| [数据模型](docs/DATA_MODEL.md) | 私人 JournalEntry 与授权 Memory/MemoryConsent 分离 |
-| [AI 工作流](docs/AI_WORKFLOW.md) | 提取候选不自动保存、逐条授权、受限召回与技术测试计划 |
-| [单篇 AI 回顾](docs/AI_REVIEW.md) | 当前接口、单次处理边界、缺 Key/取消/错误与效果评估方案 |
-| [求职作品说明](docs/PORTFOLIO_CASE_STUDY.md) | 用户假设、产品取舍、页面说明、展示顺序与最小收尾计划 |
-| [最终交付清单](docs/DELIVERY_CHECKLIST.md) | 本次实际检查、外部阻塞与只需完成的三项收尾 |
-| [B2 核心全栈说明](docs/CORE_FULLSTACK.md) | 实际代码范围、API、权限与验收边界 |
-| [真实 Supabase 接入](docs/SUPABASE_SETUP.md) | 环境配置、只读探测、迁移核查、托管项目验收与阻塞 |
-| [可用性测试主持指南](docs/USABILITY_TEST_GUIDE.md) | B1 原型入口、同意、顺序、任务、采集口径与空白观察模板 |
-
-主要取舍：手写和聊天是平行入口；自动弹窗只进入研究，轻量卡片要通过测试才启用，主动整理始终保留；回顾先证明能找回原文，再考虑 AI 故事。私人保存不等于授权角色长期记住，私人内容在用户发起单次 AI 处理时另行说明范围。
-
-## 下一阶段建议
-
-先补完托管邮件、持久化、越权与会话验收，再安全配置真实模型 Key 并运行虚构材料评测，最后用真实操作录制求职演示。停止堆功能：角色聊天、多篇故事、多角色与后台任务留到独立阶段。没有实际研究就不声称降低负担或提升效果。
+**交付范围冻结：不再扩展功能。** 公开材料仅包含匿名页面和虚构素材，不上传个人记录、API Key、Cookie、账号凭据或私人截图。
