@@ -23,16 +23,18 @@ import { JournalReview } from "./journal-review";
 
 export function EntryEditor({
   initial,
+  initialDraft,
   onSaved,
 }: {
   initial?: Entry;
+  initialDraft?: EntryDraft;
   onSaved?: (entry: Entry) => void;
 }) {
   const api = useCoreApi();
   const [baseline, setBaseline] = useState({
-    title: initial?.title || "",
-    body: initial?.body || "",
-    eventDate: initial?.event_date || "",
+    title: initial?.title || initialDraft?.title || "",
+    body: initial?.body || initialDraft?.body || "",
+    eventDate: initial?.event_date || initialDraft?.eventDate || "",
   });
   const [draft, setDraft] = useState<EntryDraft>(baseline),
     [preview, setPreview] = useState(false),
@@ -42,7 +44,7 @@ export function EntryEditor({
     [deleteOpen, setDeleteOpen] = useState(false),
     [undone, setUndone] = useState(false);
   useEffect(() => {
-    if (initial) return;
+    if (initial || initialDraft) return;
     // Browser local date after hydration avoids a UTC/server date mismatch.
     const timer = setTimeout(() => {
       const date = localDate();
@@ -50,12 +52,12 @@ export function EntryEditor({
       setDraft((value) => ({ ...value, eventDate: value.eventDate || date }));
     }, 0);
     return () => clearTimeout(timer);
-  }, [initial]);
+  }, [initial, initialDraft]);
   const request = useRef<{ fingerprint: string; id: string } | null>(null);
   const remaining = useRemaining(saved?.undo_until || null);
   const dirty =
     !saved &&
-    (draft.title !== baseline.title ||
+    (Boolean(initialDraft) || draft.title !== baseline.title ||
       draft.body !== baseline.body ||
       draft.eventDate !== baseline.eventDate);
   useUnsavedGuard(dirty);

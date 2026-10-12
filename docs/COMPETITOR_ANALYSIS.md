@@ -59,3 +59,21 @@
 当前不能声称“领先竞品”“提升留存”或某产品缺少隐私控制。上述机会是 MemoNest 的设计方向，需要竞品查证与用户测试双重支持。
 
 关联：[PRD](PRD.md) · [研究计划](USER_RESEARCH.md) · [实验方案](UX_EXPERIMENTS.md)
+
+## 2026-10-12 官方资料补充核验
+
+以下为新查阅的一方资料，覆盖这四项具体声明；上文其他待验证项不因此自动转成已验证。未登录竞品进行实机体验，未验证效果、价格或中文用户适用性。
+
+| 产品 | 官方资料可确认的能力 | 对 MemoNest 的启示（产品判断，不是竞品缺陷结论） |
+| --- | --- | --- |
+| Day One | 官方介绍默认端到端加密及跨设备同步，密钥由用户持有 | 日记信任需要明确数据边界；MemoNest 当前服务器处理正文，**不能声称端到端加密或与其隐私能力等同** |
+| Rosebud | 帮助中心描述长期记忆及 Bloom 订阅自动开启；另有周报汇总 | “AI 日记+长期记忆+回顾”并非独创，差异化应落在可解释的逐条授权、可撤回与原文回访任务 |
+| Replika | 帮助中心介绍可见记忆、基于对话模式的记忆，以及手动添加 | MemoNest 不以关系养成为终点，重点保留用户明确确认的生活记录；仍需验证用户是否在意这种区别 |
+
+证据链接（查阅日期 2026-10-12）：
+1. https://dayoneapp.com/features/end-to-end-encryption/
+2. https://help.rosebud.app/ai-analysis/long-term-memory
+3. https://help.rosebud.app/ai-analysis/weekly-report
+4. https://help.replika.com/hc/en-us/articles/37208679176077-How-does-Replika-s-memory-work
+
+这些事实不支持“首创”“更懂用户”“更安全”或“降低成本 X%”的宣传。下一步仍需围绕 E1/E2/E3 做真实任务研究。
