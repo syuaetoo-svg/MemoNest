@@ -1,5 +1,6 @@
 import "server-only";
 import { z } from "zod";
+import { responseRequest, parseResponse, AiResponseError } from "./ai-response-contract";
 import { ApiError } from "./http";
 import { resolveAiProvider, classifyAiUpstreamStatus } from "./ai-provider-config";
 
@@ -30,21 +31,7 @@ export async function generate<T>(
         Authorization: `Bearer ${config.key}`,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({
-        model: config.model,
-        store: false,
-        max_output_tokens: 3500,
-        instructions,
-        input: JSON.stringify(input),
-        text: {
-          format: {
-            type: "json_schema",
-            name: "memonest",
-            strict: true,
-            schema: z.toJSONSchema(schema, { target: "draft-7" }),
-          },
-        },
-      }),
+      body: JSON.stringify(responseRequest(config, instructions, input, schema)),
     });
     if (!response.ok) {
       // Only safe metadata: never log prompts, keys, headers, or response bodies.
@@ -70,25 +57,12 @@ export async function generate<T>(
       chunks.push(value);
     }
     const payload = JSON.parse(Buffer.concat(chunks).toString("utf8"));
-    if (payload.status !== "completed") throw new Error("incomplete");
-    const text = (payload.output || [])
-      .flatMap(
-        (item: {
-          type: string;
-          content?: { type: string; text?: string }[];
-        }) => (item.type === "message" ? item.content || [] : []),
-      )
-      .filter((part: { type: string }) => part.type === "output_text")
-      .map((part: { text: string }) => part.text)
-      .join("");
-    const result = schema.safeParse(JSON.parse(text));
-    if (!result.success) throw new Error("invalid output");
-    return result.data;
+    return parseResponse(payload, schema);
   } catch (error) {
     if (error instanceof ApiError) throw error;
     console.error("[ai-provider] response processing failed", {
       provider: config.provider,
-      category: error instanceof SyntaxError ? "invalid_json" :
+      category: error instanceof AiResponseError ? error.category : error instanceof SyntaxError ? "invalid_json" :
         error instanceof Error && error.name === "TimeoutError" ? "timeout" : "processing_error",
     });
     throw new ApiError(
