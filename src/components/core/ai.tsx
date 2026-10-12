@@ -41,7 +41,7 @@ function Consent({
         onChange={(event) => onChange(event.target.checked)}
       />
       <span>
-        同意将{scope}发送给 OpenAI 完成本次 AI
+        同意将{scope}发送给当前配置的 AI 服务商（Groq 或 OpenAI）完成本次 AI
         处理。这不会自动保存记录或增加长期记忆授权。
         <span className="mt-1 block text-xs text-muted">
           服务商可能按其安全政策保留内容；撤回长期记忆不能收回已发送的数据。
