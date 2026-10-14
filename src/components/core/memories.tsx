@@ -1,4 +1,5 @@
 "use client";
+import { Sparkles, ShieldOff, X, RefreshCw, PenLine } from "lucide-react";
 import Link from "next/link";
 import { useRef, useState } from "react";
 import { useCoreApi, messageOf, useResource } from "@/lib/core/client";
@@ -77,8 +78,8 @@ export function MemoryPermission({ entry }: { entry: Entry }) {
     }
   }
   return (
-    <Card>
-      <h2 className="text-xl font-semibold">小栖的角色记忆</h2>
+    <Card className="permission-surface">
+      <h2 className="text-xl font-semibold"><Sparkles size={20} className="control-icon" aria-hidden="true"/>小栖的角色记忆</h2>
       <p className="my-4 text-sm leading-7 text-muted">
         私人记录与长期记忆是两件事。这里只管理未来可供小栖使用的授权范围；
         单篇 AI 回顾需要另外同意当次处理，不会改变这里的授权。
@@ -86,7 +87,7 @@ export function MemoryPermission({ entry }: { entry: Entry }) {
       {loading && <p role="status">正在检查授权状态…</p>}
       <Feedback message={error} error />
       {error && (
-        <Button tone="secondary" onClick={() => void refresh()}>
+        <Button tone="secondary" onClick={() => void refresh()}><Sparkles size={16} aria-hidden="true" className="control-icon"/>
           重新检查授权
         </Button>
       )}
@@ -94,7 +95,7 @@ export function MemoryPermission({ entry }: { entry: Entry }) {
       {!loading && !error && (
         <>
           {active ? (
-            <div className="rounded-2xl bg-sage-light p-5">
+            <div className="grant-summary rounded-2xl p-5">
               <p className="font-medium">
                 已授权 · 仅限小栖 · 来源版本 {active.source_version}
               </p>
@@ -102,10 +103,10 @@ export function MemoryPermission({ entry }: { entry: Entry }) {
                 {active.summary}
               </p>
               <div className="flex flex-wrap gap-3">
-                <Button tone="secondary" onClick={() => open("edit")}>
+                <Button tone="secondary" onClick={() => open("edit")}><Sparkles size={16} aria-hidden="true" className="control-icon"/>
                   编辑授权摘要
                 </Button>
-                <Button tone="danger" onClick={() => open("revoke")}>
+                <Button tone="danger" onClick={() => open("revoke")}><ShieldOff size={16} aria-hidden="true" className="control-icon"/>
                   撤回授权
                 </Button>
               </div>
@@ -118,7 +119,7 @@ export function MemoryPermission({ entry }: { entry: Entry }) {
               <Button
                 disabled={remaining === null || remaining > 0}
                 onClick={() => open("grant")}
-              >
+              ><Sparkles size={16} aria-hidden="true" className="control-icon"/>
                 让小栖记住这条
               </Button>
               {remaining === null ? (
@@ -196,14 +197,14 @@ export function MemoryPermission({ entry }: { entry: Entry }) {
             tone="secondary"
             disabled={busy}
             onClick={() => setMode(null)}
-          >
+          ><X size={16} aria-hidden="true" className="control-icon"/>
             取消
           </Button>
           <Button
             tone={mode === "revoke" ? "danger" : "primary"}
             disabled={busy}
             onClick={submit}
-          >
+          ><ShieldOff size={16} aria-hidden="true" className="control-icon"/>
             {busy
               ? "正在确认…"
               : mode === "revoke"
@@ -217,7 +218,7 @@ export function MemoryPermission({ entry }: { entry: Entry }) {
           <Link
             className="mt-4 block py-3 text-sm underline"
             href={`/journal/${entry.id}`}
-          >
+          ><Sparkles size={16} aria-hidden="true" className="control-icon"/>
             重新加载来源与授权（放弃当前修改）
           </Link>
         )}
@@ -281,7 +282,7 @@ export function MemoryList() {
     deleted: "原记录已删除",
   };
   return (
-    <Card>
+    <Card className="memory-vault">
       <h2 className="text-xl font-semibold">角色记忆 · 小栖</h2>
       <p className="my-4 text-sm leading-7 text-muted">
         只有你逐条确认的摘要才允许进入角色上下文。没有 AI
@@ -297,7 +298,7 @@ export function MemoryList() {
             setCursor(null);
             void refresh();
           }}
-        >
+        ><RefreshCw size={16} aria-hidden="true" className="control-icon"/>
           重试加载
         </Button>
       )}
@@ -312,9 +313,9 @@ export function MemoryList() {
         {rows.map((memory) => (
           <article
             key={memory.id}
-            className="rounded-2xl border border-line bg-paper p-5"
+            className={`memory-authorization memory-authorization--${memory.status} rounded-2xl border border-line p-5`}
           >
-            <h3 className="font-semibold">{names[memory.status]}</h3>
+            <h3 className="font-semibold">{memory.status === "active" ? <Sparkles size={16} aria-hidden="true"/> : <ShieldOff size={16} aria-hidden="true"/>}{names[memory.status]}</h3>
             <p className="my-2 text-sm text-muted">
               仅限小栖 · 来源版本 {memory.source_version} ·{" "}
               {new Date(memory.created_at).toLocaleString("zh-CN")}
@@ -333,7 +334,7 @@ export function MemoryList() {
                 <Link
                   href={`/journal/${memory.journal_entry_id}`}
                   className="primary-link"
-                >
+                ><Sparkles size={16} aria-hidden="true" className="control-icon"/>
                   来源详情 / 编辑授权
                 </Link>
               )}
@@ -344,7 +345,7 @@ export function MemoryList() {
                     setActionError("");
                     setTarget(memory);
                   }}
-                >
+                ><ShieldOff size={16} aria-hidden="true" className="control-icon"/>
                   撤回授权
                 </Button>
               )}
@@ -359,7 +360,7 @@ export function MemoryList() {
           tone="secondary"
           disabled={loadingMore}
           onClick={more}
-        >
+        ><Sparkles size={16} aria-hidden="true" className="control-icon"/>
           {loadingMore ? "正在加载…" : "加载更早的授权记录"}
         </Button>
       )}
@@ -379,10 +380,10 @@ export function MemoryList() {
             tone="secondary"
             disabled={busy}
             onClick={() => setTarget(null)}
-          >
+          ><X size={16} aria-hidden="true" className="control-icon"/>
             取消
           </Button>
-          <Button tone="danger" disabled={busy} onClick={revoke}>
+          <Button tone="danger" disabled={busy} onClick={revoke}><ShieldOff size={16} aria-hidden="true" className="control-icon"/>
             {busy ? "正在撤回…" : "确认撤回授权"}
           </Button>
         </div>
@@ -393,20 +394,20 @@ export function MemoryList() {
 export function MemoryWorkspace() {
   const [tab, setTab] = useState<"private" | "role">("private");
   return (
-    <div className="space-y-5">
-      <div className="flex flex-wrap gap-3" aria-label="记录与授权区域">
+    <div className="memory-workspace space-y-5">
+      <div className="memory-switch flex flex-wrap gap-3" aria-label="记录与授权区域">
         <Button
           aria-pressed={tab === "private"}
           tone={tab === "private" ? "primary" : "secondary"}
           onClick={() => setTab("private")}
-        >
+        ><PenLine size={16} aria-hidden="true" className="control-icon"/>
           私人记录
         </Button>
         <Button
           aria-pressed={tab === "role"}
           tone={tab === "role" ? "primary" : "secondary"}
           onClick={() => setTab("role")}
-        >
+        ><Sparkles size={16} aria-hidden="true" className="control-icon"/>
           角色记忆
         </Button>
       </div>

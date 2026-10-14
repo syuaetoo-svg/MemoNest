@@ -6,6 +6,7 @@ import {
   type ButtonHTMLAttributes,
   type ReactNode,
 } from "react";
+import { GlassButton } from "@/components/glass";
 export const fieldClass =
   "glass-field w-full min-w-0 px-4 py-3 text-base";
 export function Button({
@@ -16,19 +17,14 @@ export function Button({
 }: ButtonHTMLAttributes<HTMLButtonElement> & {
   tone?: "primary" | "secondary" | "danger";
 }) {
-  const colors =
-    tone === "primary"
-      ? "glass-button--primary"
-      : tone === "danger"
-        ? "glass-button--danger"
-        : "glass-button--secondary";
   return (
-    <button
+    <GlassButton
       {...props}
-      className={`glass-button px-4 py-3 text-sm font-medium disabled:cursor-not-allowed disabled:opacity-60 ${colors} ${className}`}
+      tone={tone}
+      className={className}
     >
       {children}
-    </button>
+    </GlassButton>
   );
 }
 export function Feedback({

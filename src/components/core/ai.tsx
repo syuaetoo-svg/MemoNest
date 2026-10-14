@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { useRef, useState } from "react";
-import { Send, Sparkles } from "lucide-react";
+import { Send, Sparkles, BookOpen, ShieldCheck, Link2, Bookmark, MessageCircle, LoaderCircle, X, ChevronUp, CircleCheck, CircleAlert, Info, Search, RefreshCw, ArrowLeft, ArrowDown, History } from "lucide-react";
 import { GlassCompanion } from "@/components/glass-companion";
 import { Card, EmptyState } from "@/components/ui";
 import {
@@ -46,7 +46,8 @@ function Consent({
         处理。这不会自动保存记录或增加长期记忆授权。
         <span className="mt-1 block text-xs text-muted">
           服务商可能按其安全政策保留内容；撤回长期记忆不能收回已发送的数据。
-          <Link href="/privacy" className="underline">
+          <Link href="/privacy" className="icon-link underline">
+            <ShieldCheck aria-hidden="true"/>
             了解处理范围
           </Link>
         </span>
@@ -63,8 +64,9 @@ export function Evidence({
 }) {
   if (!citations.length) return null;
   return (
-    <details className="mt-4 rounded-xl border border-line p-3 text-xs leading-6">
+    <details className="evidence mt-4 rounded-xl border border-line p-3 text-xs leading-6">
       <summary className="cursor-pointer font-medium text-sage-dark">
+        <Link2 aria-hidden="true"/>
         查看来源依据（{citations.length}）
       </summary>
       {citations.map((item, index) => {
@@ -76,7 +78,8 @@ export function Evidence({
           >
             <p className="whitespace-pre-wrap break-words">{item.quote}</p>
             {source?.entryId && (
-              <Link className="underline" href={`/journal/${source.entryId}`}>
+              <Link className="icon-link underline" href={`/journal/${source.entryId}`}>
+                <BookOpen aria-hidden="true"/>
                 打开原记录
               </Link>
             )}
@@ -154,36 +157,42 @@ export function ChatWorkspace({ configured }: { configured: boolean }) {
   return (
     <div className="chat-workspace grid items-start gap-6 lg:grid-cols-[240px_minmax(0,1fr)]">
       <Card className="companion-profile lg:sticky lg:top-6">
-        <GlassCompanion size="small" />
+        <GlassCompanion size="small" state={busy ? "thinking" : turns.length ? "reply" : "idle"} />
         <p className="eyebrow">YOUR QUIET COMPANION</p>
         <h2 className="my-3 text-2xl font-semibold">小栖</h2>
         <p className="text-sm leading-7 text-muted">
           不急着总结你的人生。先听听，今天发生了什么。
         </p>
-        <p className="mt-5 border-t border-line pt-4 text-xs leading-6 text-muted">
+        <details className="companion-boundary mt-5 border-t border-line pt-4 text-xs leading-6 text-muted">
+          <summary><Info size={14} aria-hidden="true"/>关于对话与记忆</summary>
+          <p className="mt-2">
           AI 伙伴 · 当前页临时对话
           <br />
           离开或刷新会清除聊天。发送时使用最近 5
           条用户表达和相关有效授权摘要；历史 AI 回复不会再次发送。
-        </p>
+          </p>
+        </details>
         <Link
           className="mt-4 block text-sm text-sage-dark underline"
           href="/memories"
         >
           管理小栖的记忆权限
+          <Sparkles aria-hidden="true"/>
         </Link>
         <Link
           className="mt-3 block text-sm text-sage-dark underline"
           href="/journal"
         >
           也可以直接手写
+          <BookOpen aria-hidden="true"/>
         </Link>
       </Card>
       <div className="min-w-0 space-y-5">
         <Card className="chat-surface">
           <div className="flex items-center justify-between border-b border-line pb-4">
-            <h2 className="font-medium">今天的小片刻</h2>
-            <span className="text-xs text-muted">
+            <h2 className="font-medium"><MessageCircle size={17} aria-hidden="true"/>今天的小片刻</h2>
+            <span className="chat-service">
+              {configured ? <CircleCheck aria-hidden="true"/> : <CircleAlert aria-hidden="true"/>}
               {configured ? "AI 服务已配置" : "AI 服务未配置"}
             </span>
           </div>
@@ -205,7 +214,7 @@ export function ChatWorkspace({ configured }: { configured: boolean }) {
                   <p className="whitespace-pre-wrap break-words text-sm leading-7">
                     {turn.text}
                   </p>
-                  <label className="mt-3 flex min-h-11 items-center gap-2 text-xs">
+                  <label className="chat-selection mt-3 flex min-h-11 items-center gap-2 text-xs">
                     <input
                       type="checkbox"
                       checked={selected.includes(turn.id)}
@@ -222,11 +231,11 @@ export function ChatWorkspace({ configured }: { configured: boolean }) {
                         )
                       }
                     />
-                    选入生活记录
+                    <Bookmark aria-hidden="true"/>选入生活记录
                   </label>
                 </div>
                 <div className="chat-reply mr-5 rounded-2xl rounded-tl-sm p-4">
-                  <p className="mb-2 text-xs text-sage-dark">小栖 · AI</p>
+                  <p className="mb-2 text-xs text-sage-dark"><GlassCompanion size="mark" state="reply" />小栖 · AI</p>
                   <p className="whitespace-pre-wrap break-words text-sm leading-7">
                     {turn.result.reply}
                   </p>
@@ -239,7 +248,9 @@ export function ChatWorkspace({ configured }: { configured: boolean }) {
             ))}
           </div>
           {busy && (
-            <p role="status" className="my-4 text-sm text-sage-dark">
+            <p role="status" className="chat-status my-4 text-sm text-sage-dark">
+              <GlassCompanion size="mark" state="thinking" />
+              <LoaderCircle aria-hidden="true"/>
               {busy === "chat"
                 ? "小栖正在认真读你的话…"
                 : "正在整理你选中的原话…"}
@@ -254,9 +265,10 @@ export function ChatWorkspace({ configured }: { configured: boolean }) {
               event.preventDefault();
               void send();
             }}
-            className="mt-5 space-y-4"
+            className="chat-composer mt-5 space-y-4"
           >
             <label htmlFor="chat-message" className="block text-sm font-medium">
+              <MessageCircle aria-hidden="true"/>
               想对小栖说的话
             </label>
             <textarea
@@ -333,6 +345,7 @@ export function ChatWorkspace({ configured }: { configured: boolean }) {
                   setSelected([]);
                 }}
               >
+                {savedCandidate ? <ChevronUp size={16} aria-hidden="true"/> : <X size={16} aria-hidden="true"/>}
                 {savedCandidate ? "收起已保存记录" : "放弃候选"}
               </Button>
             </Card>
@@ -399,8 +412,8 @@ export function ReviewWorkspace({ configured }: { configured: boolean }) {
     }
   }
   return (
-    <div className="review-workspace grid items-start gap-6 lg:grid-cols-2">
-      <Card>
+    <div className="review-workspace">
+      <Card className="review-selection">
         <p className="eyebrow">CHOOSE YOUR MOMENTS</p>
         <h2 className="my-3 text-xl font-semibold">只回顾你选中的生活</h2>
         <p className="mb-5 text-sm leading-7 text-muted">
@@ -423,7 +436,7 @@ export function ReviewWorkspace({ configured }: { configured: boolean }) {
             className={fieldClass}
             placeholder="搜索一个人、一件事…"
           />
-          <Button tone="secondary" type="submit">
+          <Button tone="secondary" type="submit"><Search size={16} aria-hidden="true" className="control-icon"/>
             查找
           </Button>
         </form>
@@ -431,7 +444,7 @@ export function ReviewWorkspace({ configured }: { configured: boolean }) {
         {resource.error && (
           <>
             <Feedback error message={resource.error} />
-            <Button tone="secondary" onClick={resource.refresh}>
+            <Button tone="secondary" onClick={resource.refresh}><RefreshCw size={16} aria-hidden="true" className="control-icon"/>
               重新加载
             </Button>
           </>
@@ -475,7 +488,7 @@ export function ReviewWorkspace({ configured }: { configured: boolean }) {
         </div>
         <div className="mt-4 flex gap-3">
           {cursor && (
-            <Button tone="secondary" onClick={() => setCursor(null)}>
+            <Button tone="secondary" onClick={() => setCursor(null)}><ArrowLeft size={16} aria-hidden="true" className="control-icon"/>
               回到第一页
             </Button>
           )}
@@ -483,14 +496,14 @@ export function ReviewWorkspace({ configured }: { configured: boolean }) {
             <Button
               tone="secondary"
               onClick={() => setCursor(resource.data!.nextCursor)}
-            >
+            ><ArrowDown size={16} aria-hidden="true" className="control-icon"/>
               下一页
             </Button>
           )}
         </div>
       </Card>
-      <div className="space-y-5">
-        <Card>
+      <div className="review-narrative space-y-5">
+        <Card className="review-plan">
           <h2 className="text-xl font-semibold">
             本次回顾 · {selected.length} 篇
           </h2>
@@ -507,7 +520,7 @@ export function ReviewWorkspace({ configured }: { configured: boolean }) {
                   className="min-h-11 shrink-0 px-2 text-sage-dark underline"
                   disabled={busy}
                   onClick={() => choose(entry)}
-                >
+                ><X size={16} aria-hidden="true" className="control-icon"/>
                   移除
                 </button>
               </li>
@@ -523,7 +536,7 @@ export function ReviewWorkspace({ configured }: { configured: boolean }) {
             className="mt-4"
             disabled={busy || !consent || !selected.length || !configured}
             onClick={createReview}
-          >
+          ><History size={16} aria-hidden="true" className="control-icon"/>
             {busy ? "正在回望这些片刻…" : "生成本次回顾"}
           </Button>
           {!configured && (
@@ -537,12 +550,12 @@ export function ReviewWorkspace({ configured }: { configured: boolean }) {
           <Link
             href="/memories"
             className="mt-4 block text-sm text-sage-dark underline"
-          >
+          ><ArrowLeft size={16} aria-hidden="true" className="control-icon"/>
             回到私人时间线
           </Link>
         </Card>
         {result && (
-          <Card>
+          <Card className="review-story">
             <p className="eyebrow">A LOOK BACK · AI 生成</p>
             <h2 className="my-4 text-2xl font-semibold">{result.title}</h2>
             <p className="mb-4 text-xs text-muted">

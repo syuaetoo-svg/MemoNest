@@ -1,4 +1,5 @@
 "use client";
+import { RefreshCw, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import type { Entry } from "@/lib/core/contracts";
 import type { ReviewResult } from "@/lib/core/review";
@@ -48,7 +49,7 @@ export function JournalReview({ entry }: { entry: Entry }) {
     }
   }
   return (
-    <Card>
+    <Card className="single-review">
       <p className="eyebrow">ONE MOMENT, LOOKED AT AGAIN</p>
       <h2 className="my-3 text-xl font-semibold">重新看看这个片刻</h2>
       <p className="mb-4 text-sm leading-7 text-muted">
@@ -66,10 +67,10 @@ export function JournalReview({ entry }: { entry: Entry }) {
         我同意把这篇记录交给 OpenAI 做本次回顾，这不等于长期记忆授权。
       </label>
       <div className="mb-4 flex flex-wrap gap-3">
-        <Button disabled={!consent || busy || entry.body.length > 6000} onClick={generate}>
+        <Button disabled={!consent || busy || entry.body.length > 6000} onClick={generate}><RefreshCw size={16} aria-hidden="true" className="control-icon"/>
           {busy ? "正在回顾…" : error ? "重新确认并重试" : "生成本次回顾"}
         </Button>
-        {(busy || result || consent) && <Button tone="secondary" onClick={clear}>
+        {(busy || result || consent) && <Button tone="secondary" onClick={clear}><X size={16} aria-hidden="true" className="control-icon"/>
           {busy ? "停止回顾" : "清除回顾与当次选择"}
         </Button>}
       </div>

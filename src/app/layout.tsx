@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowUpRight } from "lucide-react";
+import { UserRound } from "lucide-react";
 import { Navigation } from "@/components/navigation";
 import { GlassCompanion } from "@/components/glass-companion";
 import "./globals.css";
+import "./fonts.css";
 
 export const metadata: Metadata = {
   title: { default: "MemoNest · 记忆小屋", template: "%s · MemoNest" },
@@ -14,7 +15,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
     <a href="#main-content" className="skip-link">跳到主要内容</a>
     <header className="site-header"><div className="header-inner">
       <Link href="/" className="brand" aria-label="MemoNest 记忆小屋首页"><GlassCompanion size="mark" /><span><span className="brand-name">MemoNest</span><span className="brand-note">给生活一个温柔的落点</span></span></Link>
-      <div className="header-actions"><Navigation /><Link href="/account" className="account-link">账号 / 登录<ArrowUpRight size={13} aria-hidden="true" /></Link></div>
+      <div className="header-actions"><Navigation /><Link href="/account" className="account-link"><UserRound size={15} aria-hidden="true" />账号 / 登录</Link></div>
     </div></header>
     <main id="main-content" className="site-main">{children}</main>
     <footer className="site-footer"><p>MemoNest · 留住你愿意留下的生活</p><p>AI 陪伴 · 私人记录 · 授权记忆</p></footer>

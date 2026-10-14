@@ -1,4 +1,5 @@
 "use client";
+import { LogIn, UserPlus, PenLine, LogOut, Check, ArrowLeft } from "lucide-react";
 import { useState, type FormEvent } from "react";
 import Link from "next/link";
 import { api, messageOf } from "@/lib/core/client";
@@ -40,7 +41,7 @@ export function AccountForm({ returnTo }: { returnTo: string }) {
     }
   }
   return (
-    <Card>
+    <Card className="account-surface">
       <div className="mb-6 flex gap-3">
         <Button
           tone={mode === "login" ? "primary" : "secondary"}
@@ -50,7 +51,7 @@ export function AccountForm({ returnTo }: { returnTo: string }) {
             setNotice("");
           }}
           disabled={busy}
-        >
+        ><LogIn size={16} aria-hidden="true" className="control-icon"/>
           登录
         </Button>
         <Button
@@ -61,7 +62,7 @@ export function AccountForm({ returnTo }: { returnTo: string }) {
             setNotice("");
           }}
           disabled={busy}
-        >
+        ><UserPlus size={16} aria-hidden="true" className="control-icon"/>
           注册
         </Button>
       </div>
@@ -106,7 +107,7 @@ export function AccountForm({ returnTo }: { returnTo: string }) {
         </div>
         <Feedback message={error} error />
         <Feedback message={notice} />
-        <Button type="submit" disabled={busy}>
+        <Button type="submit" disabled={busy}><UserPlus size={16} aria-hidden="true" className="control-icon"/>
           {busy ? "正在验证…" : mode === "login" ? "登录小屋" : "注册账号"}
         </Button>
       </form>
@@ -145,10 +146,10 @@ export function SignedInAccount({
       <p className="my-4 break-all text-sm text-muted">{email}</p>
       <Feedback message={error} error />
       <div className="mt-5 flex flex-wrap gap-3">
-        <Link className="primary-link" href={returnTo}>
+        <Link className="primary-link" href={returnTo}><PenLine size={16} aria-hidden="true" className="control-icon"/>
           继续记录
         </Link>
-        <Button tone="secondary" disabled={busy} onClick={logout}>
+        <Button tone="secondary" disabled={busy} onClick={logout}><LogOut size={16} aria-hidden="true" className="control-icon"/>
           {busy ? "正在退出…" : "退出所有会话"}
         </Button>
       </div>
@@ -179,10 +180,10 @@ export function ConfirmEmail({ tokenHash }: { tokenHash: string }) {
         只有你主动确认后才建立登录会话。确认链接只能使用一次。
       </p>
       <Feedback message={error} error />
-      <Button disabled={busy || !tokenHash} onClick={confirm}>
+      <Button disabled={busy || !tokenHash} onClick={confirm}><Check size={16} aria-hidden="true" className="control-icon"/>
         {busy ? "正在确认…" : "确认邮箱"}
       </Button>
-      <Link className="ml-4 text-sm underline" href="/account">
+      <Link className="ml-4 text-sm underline" href="/account"><ArrowLeft size={16} aria-hidden="true" className="control-icon"/>
         返回登录
       </Link>
       {!tokenHash && (

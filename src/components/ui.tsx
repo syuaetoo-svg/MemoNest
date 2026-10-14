@@ -2,13 +2,14 @@ import type { ReactNode } from "react";
 import Link from "next/link";
 import { ArrowUpRight, LockKeyhole } from "lucide-react";
 import { GlassCompanion } from "./glass-companion";
+import { GlassSurface } from "./glass";
 
 export function PageHeading({ eyebrow, title, description }: { eyebrow: string; title: string; description: string }) {
   return <header className="page-heading"><p className="eyebrow mb-3">{eyebrow}</p><h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">{title}</h1><p className="mt-4 max-w-2xl leading-7 text-muted">{description}</p></header>;
 }
 
 export function Card({ children, className = "" }: { children: ReactNode; className?: string }) {
-  return <section className={`glass-panel p-6 sm:p-8 ${className}`}>{children}</section>;
+  return <GlassSurface className={`p-6 sm:p-8 ${className}`}>{children}</GlassSurface>;
 }
 
 export function FeatureLink({ href, title, description, children }: { href: string; title: string; description: string; children: ReactNode }) {

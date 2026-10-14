@@ -20,6 +20,7 @@ import { Card, EmptyState } from "@/components/ui";
 import { Button, Dialog, Feedback, fieldClass } from "./ui";
 import { MemoryPermission } from "./memories";
 import { JournalReview } from "./journal-review";
+import { BookOpen, Undo2, History, PenLine, X, Trash2, Save, Eye, RefreshCw, CalendarDays, Search, ArrowDown, ArrowLeft, ArrowUpRight, LockKeyhole } from "lucide-react";
 
 export function EntryEditor({
   initial,
@@ -142,10 +143,12 @@ export function EntryEditor({
             </p>
             <div className="mt-5 flex flex-wrap gap-3">
               <Link href={`/journal/${saved.id}`} className="primary-link">
+                <BookOpen size={16} aria-hidden="true"/>
                 查看记录详情
               </Link>
               {!initial && remaining !== null && remaining > 0 && (
                 <Button tone="secondary" onClick={() => setDeleteOpen(true)}>
+                  <Undo2 size={16} aria-hidden="true"/>
                   撤销保存（{remaining} 秒）
                 </Button>
               )}
@@ -153,6 +156,7 @@ export function EntryEditor({
           </Card>
         )}
         <Link href="/memories" className="primary-link">
+          <History size={16} aria-hidden="true"/>
           回到私人时间线
         </Link>
         {!initial && (
@@ -169,6 +173,7 @@ export function EntryEditor({
             }}
           >
             再写一篇
+            <PenLine size={16} aria-hidden="true"/>
           </Button>
         )}
         <Dialog
@@ -188,8 +193,10 @@ export function EntryEditor({
               onClick={() => setDeleteOpen(false)}
             >
               取消
+              <X size={16} aria-hidden="true"/>
             </Button>
             <Button tone="danger" disabled={busy} onClick={undo}>
+              <Trash2 size={16} aria-hidden="true"/>
               {busy ? "正在删除…" : "确认撤销并删除"}
             </Button>
           </div>
@@ -197,7 +204,8 @@ export function EntryEditor({
       </div>
     );
   return (
-    <Card className="memory-film">
+    <Card className="journal-canvas">
+      <p className="eyebrow mb-4">A MOMENT TO KEEP</p>
       <h2 className="mb-5 text-xl font-semibold">
         {initial ? "修改生活记录" : "一篇新的生活记录"}
       </h2>
@@ -205,6 +213,7 @@ export function EntryEditor({
         <fieldset disabled={busy || preview} className="space-y-5">
           <div>
             <label htmlFor="journal-title" className="mb-2 block text-sm">
+              <PenLine size={15} className="mr-2 inline" aria-hidden="true"/>
               给这个片刻起个名字（可留空）
             </label>
             <input
@@ -218,6 +227,7 @@ export function EntryEditor({
           </div>
           <div>
             <label htmlFor="journal-date" className="mb-2 block text-sm">
+              <CalendarDays size={15} className="mr-2 inline" aria-hidden="true"/>
               事情发生的日期
             </label>
             <input
@@ -248,6 +258,7 @@ export function EntryEditor({
           </div>
         </fieldset>
         <p className="text-sm leading-7 text-muted">
+          <LockKeyhole size={15} className="mr-2 inline" aria-hidden="true"/>
           仅保存到你的私人记录。不会默认进入 AI 上下文，也不需要选择角色。
           {initial && "保存修改会撤回依赖旧版本的角色授权。"}
         </p>
@@ -272,8 +283,10 @@ export function EntryEditor({
                 }}
               >
                 返回编辑
+                <PenLine size={16} aria-hidden="true"/>
               </Button>
               <Button type="button" disabled={busy} onClick={save}>
+                <Save size={16} aria-hidden="true"/>
                 {busy
                   ? "正在保存…"
                   : initial
@@ -283,15 +296,16 @@ export function EntryEditor({
             </div>
             {initial && (
               <Link
-                className="block text-sm underline"
+                className="icon-link text-sm underline"
                 href={`/journal/${initial.id}`}
               >
                 冲突时重新加载记录（放弃当前草稿）
+                <RefreshCw size={16} aria-hidden="true"/>
               </Link>
             )}
           </div>
         ) : (
-          <Button type="submit">预览私人记录</Button>
+          <Button type="submit"><Eye size={16} aria-hidden="true"/>预览私人记录</Button>
         )}
       </form>
     </Card>
@@ -344,10 +358,10 @@ export function JournalTimeline() {
   }
   const entries = data ? [...data.entries, ...extra] : [];
   return (
-    <Card>
+    <Card className="timeline-canvas">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h2 className="text-xl font-semibold">私人记录时间线</h2>
-        <Link className="primary-link" href="/journal">
+        <Link className="primary-link" href="/journal"><PenLine size={16} aria-hidden="true" className="control-icon"/>
           写下新片刻
         </Link>
       </div>
@@ -362,7 +376,7 @@ export function JournalTimeline() {
             placeholder="找回一段经历"
           />
         </label>
-        <Button className="self-end" type="submit">
+        <Button className="self-end" type="submit"><Search size={16} aria-hidden="true" className="control-icon"/>
           查找
         </Button>
         <Button
@@ -374,7 +388,7 @@ export function JournalTimeline() {
             setActiveQuery("");
             resetPages();
           }}
-        >
+        ><X size={16} aria-hidden="true" className="control-icon"/>
           清除筛选
         </Button>
       </form>
@@ -390,7 +404,7 @@ export function JournalTimeline() {
             resetPages();
             void refresh();
           }}
-        >
+        ><RefreshCw size={16} aria-hidden="true" className="control-icon"/>
           重试加载
         </Button>
       )}
@@ -404,14 +418,14 @@ export function JournalTimeline() {
           }
         />
       )}
-      <div className="space-y-3">
+      <div className="timeline-story space-y-3">
         {entries.map((entry) => (
           <Link
             key={entry.id}
             href={`/journal/${entry.id}`}
-            className="glass-feature memory-film block p-5"
+            className="timeline-fragment glass-feature block p-5"
           >
-            <p className="text-sm text-muted">{entry.event_date} · 私人记录</p>
+            <p className="fragment-date text-sm text-muted"><CalendarDays size={14} aria-hidden="true"/>{entry.event_date} · 私人记录</p>
             <h3 className="my-2 break-words font-semibold">
               {entryTitle(entry)}
             </h3>
@@ -419,7 +433,7 @@ export function JournalTimeline() {
               {entry.body}
             </p>
             <span className="mt-3 block text-sm text-sage-dark">
-              查看全文与权限 →
+              <span className="icon-link"><BookOpen size={14} aria-hidden="true"/>查看全文与权限<ArrowUpRight size={14} aria-hidden="true"/></span>
             </span>
           </Link>
         ))}
@@ -431,7 +445,7 @@ export function JournalTimeline() {
           tone="secondary"
           disabled={loadingMore}
           onClick={more}
-        >
+        ><ArrowDown size={16} aria-hidden="true" className="control-icon"/>
           {loadingMore ? "正在加载…" : "加载更早的记录"}
         </Button>
       )}
@@ -470,19 +484,19 @@ export function EntryDetail({ id }: { id: string }) {
     return (
       <Card>
         <Feedback message={error || "记录不可访问"} error />
-        <Button tone="secondary" onClick={() => void refresh()}>
+        <Button tone="secondary" onClick={() => void refresh()}><RefreshCw size={16} aria-hidden="true" className="control-icon"/>
           重试加载
         </Button>
-        <Link className="ml-4 underline" href="/memories">
+        <Link className="ml-4 underline" href="/memories"><ArrowLeft size={16} aria-hidden="true" className="control-icon"/>
           返回时间线
         </Link>
       </Card>
     );
   const entry = data.entry;
   return (
-    <div className="space-y-5">
-      <Link className="inline-block py-3 text-sm underline" href="/memories">
-        ← 返回私人时间线
+    <div className="entry-detail space-y-5">
+      <Link className="inline-block py-3 text-sm underline" href="/memories"><ArrowLeft size={16} aria-hidden="true" className="control-icon"/>
+        返回私人时间线
       </Link>
       <Feedback message={notice} />
       {editing ? (
@@ -501,12 +515,12 @@ export function EntryDetail({ id }: { id: string }) {
             onClick={() => {
               if (window.confirm("放弃当前修改？")) setEditing(false);
             }}
-          >
+          ><X size={16} aria-hidden="true" className="control-icon"/>
             取消编辑
           </Button>
         </>
       ) : (
-        <Card>
+        <Card className="entry-reading">
           <p className="text-sm text-muted">
             {entry.event_date} · 私人记录 · 版本 {entry.version}
           </p>
@@ -521,7 +535,7 @@ export function EntryDetail({ id }: { id: string }) {
             {new Date(entry.updated_at).toLocaleString("zh-CN")}
           </p>
           <div className="flex flex-wrap gap-3">
-            <Button tone="secondary" onClick={() => setEditing(true)}>
+            <Button tone="secondary" onClick={() => setEditing(true)}><PenLine size={16} aria-hidden="true" className="control-icon"/>
               编辑记录
             </Button>
             <Button
@@ -530,7 +544,7 @@ export function EntryDetail({ id }: { id: string }) {
                 setActionError("");
                 setDeleteOpen(true);
               }}
-            >
+            ><Trash2 size={16} aria-hidden="true" className="control-icon"/>
               {remaining !== null && remaining > 0
                 ? `撤销保存（${remaining} 秒） / 删除`
                 : "删除记录"}
@@ -557,10 +571,10 @@ export function EntryDetail({ id }: { id: string }) {
             tone="secondary"
             disabled={busy}
             onClick={() => setDeleteOpen(false)}
-          >
+          ><X size={16} aria-hidden="true" className="control-icon"/>
             取消
           </Button>
-          <Button tone="danger" disabled={busy} onClick={remove}>
+          <Button tone="danger" disabled={busy} onClick={remove}><Trash2 size={16} aria-hidden="true" className="control-icon"/>
             {busy ? "正在删除…" : "确认删除记录"}
           </Button>
         </div>
@@ -573,7 +587,7 @@ export function EntryDetail({ id }: { id: string }) {
               setDeleteOpen(false);
               void refresh();
             }}
-          >
+          ><RefreshCw size={16} aria-hidden="true" className="control-icon"/>
             重新加载当前版本
           </Button>
         )}

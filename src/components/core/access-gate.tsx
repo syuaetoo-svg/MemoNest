@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Card } from "@/components/ui";
 import type { accountState } from "@/lib/server/supabase";
+import { LogIn, RefreshCw, House } from "lucide-react";
 type State = Awaited<ReturnType<typeof accountState>>;
 export function AccessGate({
   state,
@@ -31,15 +32,15 @@ export function AccessGate({
             className="primary-link"
             href={`/account?returnTo=${encodeURIComponent(returnTo)}`}
           >
-            登录或注册
+            <LogIn size={16} aria-hidden="true"/>登录或注册
           </Link>
         ) : (
           <Link className="primary-link" href={returnTo}>
-            重新检查服务
+            <RefreshCw size={16} aria-hidden="true"/>重新检查服务
           </Link>
         )}
         <Link className="primary-link" href="/">
-          返回首页
+          <House size={16} aria-hidden="true"/>返回首页
         </Link>
       </div>
     </Card>

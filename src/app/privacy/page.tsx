@@ -1,3 +1,4 @@
+import { ExternalLink, Sparkles } from "lucide-react";
 import Link from "next/link";
 import { Card, PageHeading } from "@/components/ui";
 export default function PrivacyPage() {
@@ -8,7 +9,7 @@ export default function PrivacyPage() {
         title="记录与记忆，由你决定"
         description="你可以只写日记，也可以选择使用 AI。两种方式都能留下生活。"
       />
-      <Card>
+      <Card className="privacy-reading">
         <div className="space-y-5 text-sm leading-7">
           <p>
             <strong>私人记录：</strong>保存在你的 Supabase
@@ -34,7 +35,7 @@ export default function PrivacyPage() {
             <a
               className="underline text-sage-dark"
               href="https://developers.openai.com/api/docs/guides/your-data"
-            >
+            ><ExternalLink size={16} aria-hidden="true" className="control-icon"/>
               阅读 OpenAI 数据政策
             </a>
             。数据库备份的删除时效取决于部署配置。
@@ -43,7 +44,7 @@ export default function PrivacyPage() {
             小栖是
             AI，可能出错；来源链接用于核对，不代表生成内容绝对正确。它不替代现实关系或专业支持。
           </p>
-          <Link className="primary-link" href="/memories">
+          <Link className="primary-link" href="/memories"><Sparkles size={16} aria-hidden="true" className="control-icon"/>
             查看记录和授权
           </Link>
         </div>
