@@ -197,7 +197,7 @@ export function EntryEditor({
       </div>
     );
   return (
-    <Card>
+    <Card className="memory-film">
       <h2 className="mb-5 text-xl font-semibold">
         {initial ? "修改生活记录" : "一篇新的生活记录"}
       </h2>
@@ -409,7 +409,7 @@ export function JournalTimeline() {
           <Link
             key={entry.id}
             href={`/journal/${entry.id}`}
-            className="block rounded-2xl border border-line bg-paper p-5 hover:border-sage"
+            className="glass-feature memory-film block p-5"
           >
             <p className="text-sm text-muted">{entry.event_date} · 私人记录</p>
             <h3 className="my-2 break-words font-semibold">

@@ -1,7 +1,8 @@
 "use client";
 import Link from "next/link";
 import { useRef, useState } from "react";
-import { Leaf, Send, Sparkles } from "lucide-react";
+import { Send, Sparkles } from "lucide-react";
+import { GlassCompanion } from "@/components/glass-companion";
 import { Card, EmptyState } from "@/components/ui";
 import {
   useCoreApi,
@@ -32,10 +33,10 @@ function Consent({
   disabled?: boolean;
 }) {
   return (
-    <label className="flex items-start gap-3 rounded-2xl bg-paper p-4 text-sm leading-6">
+    <label className="consent-panel flex items-start gap-3 rounded-2xl p-4 text-sm leading-6">
       <input
         type="checkbox"
-        className="mt-1 h-5 w-5 shrink-0 accent-[#42634d]"
+        className="mt-1 h-5 w-5 shrink-0"
         checked={checked}
         disabled={disabled}
         onChange={(event) => onChange(event.target.checked)}
@@ -151,11 +152,9 @@ export function ChatWorkspace({ configured }: { configured: boolean }) {
     }
   }
   return (
-    <div className="grid items-start gap-6 lg:grid-cols-[240px_minmax(0,1fr)]">
-      <Card className="lg:sticky lg:top-6">
-        <div className="mb-5 flex h-16 w-16 items-center justify-center rounded-3xl bg-sage-light text-sage-dark">
-          <Leaf size={32} aria-hidden="true" />
-        </div>
+    <div className="chat-workspace grid items-start gap-6 lg:grid-cols-[240px_minmax(0,1fr)]">
+      <Card className="companion-profile lg:sticky lg:top-6">
+        <GlassCompanion size="small" />
         <p className="eyebrow">YOUR QUIET COMPANION</p>
         <h2 className="my-3 text-2xl font-semibold">小栖</h2>
         <p className="text-sm leading-7 text-muted">
@@ -181,7 +180,7 @@ export function ChatWorkspace({ configured }: { configured: boolean }) {
         </Link>
       </Card>
       <div className="min-w-0 space-y-5">
-        <Card>
+        <Card className="chat-surface">
           <div className="flex items-center justify-between border-b border-line pb-4">
             <h2 className="font-medium">今天的小片刻</h2>
             <span className="text-xs text-muted">
@@ -201,7 +200,7 @@ export function ChatWorkspace({ configured }: { configured: boolean }) {
           >
             {turns.map((turn) => (
               <div key={turn.id} className="space-y-3">
-                <div className="ml-5 rounded-2xl rounded-tr-sm bg-sage-light p-4">
+                <div className="chat-user ml-5 rounded-2xl rounded-tr-sm p-4">
                   <p className="mb-2 text-xs text-sage-dark">你</p>
                   <p className="whitespace-pre-wrap break-words text-sm leading-7">
                     {turn.text}
@@ -226,7 +225,7 @@ export function ChatWorkspace({ configured }: { configured: boolean }) {
                     选入生活记录
                   </label>
                 </div>
-                <div className="mr-5 rounded-2xl rounded-tl-sm border border-line p-4">
+                <div className="chat-reply mr-5 rounded-2xl rounded-tl-sm p-4">
                   <p className="mb-2 text-xs text-sage-dark">小栖 · AI</p>
                   <p className="whitespace-pre-wrap break-words text-sm leading-7">
                     {turn.result.reply}
@@ -400,7 +399,7 @@ export function ReviewWorkspace({ configured }: { configured: boolean }) {
     }
   }
   return (
-    <div className="grid items-start gap-6 lg:grid-cols-2">
+    <div className="review-workspace grid items-start gap-6 lg:grid-cols-2">
       <Card>
         <p className="eyebrow">CHOOSE YOUR MOMENTS</p>
         <h2 className="my-3 text-xl font-semibold">只回顾你选中的生活</h2>
@@ -447,7 +446,7 @@ export function ReviewWorkspace({ configured }: { configured: boolean }) {
           {resource.data?.entries.map((entry) => (
             <label
               key={entry.id}
-              className="flex gap-3 rounded-2xl border border-line p-4"
+              className="timeline-moment flex gap-3 rounded-2xl border border-line p-4"
             >
               <input
                 type="checkbox"
@@ -550,7 +549,7 @@ export function ReviewWorkspace({ configured }: { configured: boolean }) {
               仅根据本次所选记录生成，未保存。请对照原文核实；来源真实不代表概括绝无误差。
             </p>
             {result.moments.map((moment, index) => (
-              <div key={index} className="border-t border-line py-5">
+              <div key={index} className="timeline-moment py-5">
                 <p className="whitespace-pre-wrap text-sm leading-7">
                   {moment.text}
                 </p>
