@@ -59,8 +59,10 @@ test("Groq is still selected when OpenAI is only partially configured", () => {
 
 test("upstream errors are classified without leaking response content", () => {
   assert.deepEqual([400, 401, 403, 422, 429, 500].map((status) => classifyAiUpstreamStatus(status).code), [
-    "AI_BAD_REQUEST", "AI_AUTH_FAILED", "AI_AUTH_FAILED", "AI_BAD_REQUEST", "AI_RATE_LIMIT", "AI_UNAVAILABLE",
+    "AI_BAD_REQUEST", "AI_AUTH_FAILED", "AI_ACCESS_DENIED", "AI_BAD_REQUEST", "AI_RATE_LIMIT", "AI_UNAVAILABLE",
   ]);
   assert.equal(classifyAiUpstreamStatus(429).status, 429);
   assert.equal(classifyAiUpstreamStatus(401).status, 503);
+  assert.equal(classifyAiUpstreamStatus(403).status, 503);
+  assert(!classifyAiUpstreamStatus(403).message.includes("密钥"));
 });

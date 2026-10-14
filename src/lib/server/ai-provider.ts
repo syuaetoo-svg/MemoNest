@@ -60,6 +60,10 @@ export async function generate<T>(
     return parseResponse(payload, schema);
   } catch (error) {
     if (error instanceof ApiError) throw error;
+    if (error instanceof TypeError && error.message === "fetch failed") {
+      console.error("[ai-provider] transport failed", { provider: config.provider });
+      throw new ApiError(503, "AI_NETWORK_UNAVAILABLE", "暂时无法连接模型服务，请稍后重试。内容没有自动保存。");
+    }
     console.error("[ai-provider] response processing failed", {
       provider: config.provider,
       category: error instanceof AiResponseError ? error.category : error instanceof SyntaxError ? "invalid_json" :
