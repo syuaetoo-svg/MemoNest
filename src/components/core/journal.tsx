@@ -311,11 +311,11 @@ export function EntryEditor({
     </Card>
   );
 }
-export function JournalTimeline() {
+export function JournalTimeline({ initialQuery = "" }: { initialQuery?: string } = {}) {
   const api = useCoreApi();
   const pageGeneration = useRef(0);
-  const [query, setQuery] = useState(""),
-    [activeQuery, setActiveQuery] = useState(""),
+  const [query, setQuery] = useState(initialQuery),
+    [activeQuery, setActiveQuery] = useState(initialQuery),
     [extra, setExtra] = useState<Entry[]>([]),
     [cursor, setCursor] = useState<string | null>(null),
     [loadingMore, setLoadingMore] = useState(false),

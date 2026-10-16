@@ -25,3 +25,59 @@ body:has(.overview-page)>.site-main{max-width:1536px;padding:28px 48px 22px;min-
 @media(max-width:500px){body:has(.overview-page)>.site-main{padding:21px 20px 25px}.overview-header{gap:18px}.overview-brand{font-size:21px;gap:9px}.overview-brand svg{width:35px}.overview-account{gap:10px}.overview-avatar{width:44px;height:44px}.overview-search{background:transparent;padding:9px;min-height:44px}.overview-header nav a{font-size:12px;padding:8px 7px}.overview-intro{align-items:flex-start;flex-direction:column;gap:15px}.overview-kicker{font-size:9px;margin-bottom:10px}.overview-intro h1{font-size:30px;max-width:290px}.overview-intro .overview-new{align-self:flex-start;padding:10px 17px}.overview-moments{padding:21px 19px;min-height:380px}.overview-section-heading h2{font-size:22px}.overview-tabs{gap:12px;font-size:11px}.overview-tabs>span:first-child{padding:7px 13px}.overview-empty{padding:23px 0;min-height:255px}.overview-empty p{font-size:12px}.overview-bottom{grid-template-columns:1fr;gap:13px}.overview-bottom>a{padding:20px;min-height:185px}.overview-bottom h2{font-size:19px}.overview-week{justify-content:flex-start;gap:17px}.overview-notebook{right:42px;bottom:24px;width:75px;height:105px;opacity:1}.overview-chat{margin-top:20px;padding:26px 20px 18px;min-height:560px}.overview-chat-heading h2{font-size:22px}.overview-cat{right:0;top:65px}.overview-cat .glass-companion{width:210px;height:210px}.overview-chat-welcome{padding-top:170px}.overview-bubble{font-size:14px;max-width:245px}.overview-chat-note{margin:22px 5px 35px}.overview-composer{font-size:13px;padding-left:18px}.overview-footer{align-items:flex-start;flex-direction:column;gap:0;margin-top:30px}.overview-footer a{min-height:44px}}
 @media(prefers-reduced-motion:reduce){.overview-page *,.overview-page *::before,.overview-page *::after{animation:none!important;transition:none!important}}
 @supports not (backdrop-filter:blur(1px)){.overview-glass{background:#fdfdfe}.overview-chat{background:linear-gradient(#f7f5fa,#ede2f3)}}
+
+/* Reference calibration: primary artboard 1536 × 1024. */
+body:has(.overview-page){background:#faf9fc}
+body:has(.overview-page)::before{background:radial-gradient(ellipse at 85% 76%,#e6d7f22e,transparent 48%),radial-gradient(ellipse at 30% 42%,#f5edf122,transparent 44%),linear-gradient(125deg,#ffffffcf,#faf9fc 70%,#f7f6fa)}
+.overview-search input{font:inherit;min-width:0;width:194px;border:0;background:transparent;color:#4f4e5b;outline-offset:5px}
+.overview-search input::placeholder{color:#9898a8}.overview-search button{display:grid;place-items:center;border:0;padding:0;background:transparent;cursor:pointer;color:#575864;min-height:28px;min-width:28px}
+@media(min-width:1201px){
+ body:has(.overview-page)>.site-main{padding:30px 52px 24px 58px}
+ .overview-header{height:52px;min-height:52px;position:relative;margin-bottom:49px}
+ .overview-brand{font-size:24px;gap:15px}.overview-header nav{position:absolute;left:50%;transform:translateX(-50%);width:508px;height:52px;justify-content:space-between;padding:5px 8px}
+ .overview-header nav a{font-size:16px;min-height:40px;padding:6px 23px}
+ .overview-account{gap:24px}.overview-search{width:268px;height:52px;padding:10px 14px;gap:9px;font-size:15px}.overview-avatar{width:52px;height:52px}
+ .overview-columns{grid-template-columns:minmax(0,1.88fr) minmax(0,1fr);gap:30px}
+ .overview-intro{height:88px;min-height:88px;margin-bottom:30px;position:relative;align-items:flex-end}
+ .overview-intro>div{width:100%}.overview-kicker{font-size:12px;letter-spacing:.18em;margin-bottom:11px}
+ .overview-intro h1{font-size:44px;line-height:1.3;letter-spacing:-.025em;white-space:nowrap}
+ .overview-new{position:absolute;right:0;bottom:9px;width:155px;height:50px;font-size:16px;padding:10px 16px}
+ .overview-intro h1{max-width:calc(100% - 167px);font-size:clamp(29px,2.86vw,44px)}
+ .overview-moments{height:492px;min-height:492px;padding:26px 32px;overflow:auto;scrollbar-width:thin}
+ .overview-section-heading h2{font-size:30px}.overview-tabs{margin-top:17px;font-size:16px;gap:24px}
+ .overview-tabs>span:first-child{padding:8px 23px}.overview-empty{min-height:341px}.overview-empty h3{font-size:21px}.overview-empty p{font-size:15px}.overview-text-link{font-size:14px}
+ .overview-bottom{margin-top:20px;gap:16px;grid-template-columns:1.06fr 1fr}
+ .overview-bottom>a{height:193px;min-height:193px;padding:24px 31px}
+ .overview-bottom h2{font-size:21px}.overview-bottom p{font-size:15px;margin-top:5px}
+ .overview-summary>p,.overview-summary>.overview-card-action,.overview-memory>.overview-card-action{display:none}
+ .overview-week{margin:30px 0 0}.overview-week i{width:40px;height:40px}.overview-week small{font-size:12px}
+ .overview-memory-note{margin-top:39px;font-size:13px}.overview-memory-note small{font-size:12px}
+ .overview-notebook{width:94px;height:126px;right:48px;bottom:25px}.overview-notebook span{font-size:10px}
+ .overview-chat{margin-top:57px;min-height:754px;height:754px;padding:9px 24px 24px;border-radius:28px;overflow:visible}
+ .overview-chat::before{inset:-50px 82px 9px 54px;transform:rotate(2deg);border-radius:27px;background:linear-gradient(135deg,#ffffff60,#e0dce92e)}
+ .overview-chat::after{inset:34px 38px -27px 27px;transform:rotate(5deg);background:#dfd9e63d}
+ .overview-chat-heading{padding:0 10px;min-height:74px}.overview-chat-heading h2{font-size:25px}.overview-chat-heading p{font-size:16px;gap:10px;margin-top:2px}.overview-chat-heading p>span{width:11px;height:11px}
+ .overview-cat{position:absolute;right:14px;top:113px;height:202px;min-height:202px;padding:0}.overview-cat .glass-companion{width:225px;height:225px}
+ .overview-chat-welcome{padding-top:230px}.overview-bubble{width:242px;max-width:242px;padding:17px 21px;font-size:18px;line-height:1.6;border-radius:21px 21px 21px 5px;position:relative}.overview-bubble::after{content:"";position:absolute;left:5px;bottom:-9px;border-top:13px solid #ffffffb8;border-right:12px solid transparent;transform:rotate(8deg)}
+ .overview-chat-note{margin:35px 4px 0;color:#94869e;font-size:14px}
+ .overview-composer{min-height:88px;padding:14px 17px 14px 29px;border-radius:33px;font-size:17px;margin-top:auto}.overview-composer>span:last-child{width:60px;height:60px}
+ .overview-login-note{font-size:10px;margin-top:8px}.overview-footer{margin-top:25px}
+ .overview-live-chat{margin-top:223px;overflow-y:auto;scrollbar-width:thin;padding:0 1px 8px}
+}
+/* Local refraction is translucent, never a full-page purple wash. */
+.overview-glass{background:linear-gradient(125deg,#ffffffb5,#ffffff6b);border-color:#ffffffda;box-shadow:inset 0 1px 1px #fff,0 14px 40px -20px #75758f24}
+.overview-chat{background:radial-gradient(ellipse at 64% 100%,#d6b5e47a,transparent 60%),radial-gradient(ellipse at 22% 83%,#f0d8eb75,transparent 42%),linear-gradient(135deg,#ffffff9c,#e9e7ed5c 50%,#f0e7f57a);box-shadow:inset 0 1px 2px #ffffffeb,0 20px 45px -17px #8b789b38}
+@media(max-width:1200px){.overview-search input{width:150px}.overview-search{padding:10px 13px}.overview-header{gap:12px}.overview-header nav a{padding:8px 11px}}
+@media(max-width:1050px){.overview-search input{width:105px}.overview-brand{font-size:20px}.overview-account{gap:9px}}
+@media(max-width:850px){.overview-search input{width:155px}.overview-header nav{position:static;transform:none}.overview-search{background:#eeedf24d}.overview-chat-welcome{padding-top:180px}}
+@media(max-width:500px){.overview-search{padding:5px 8px;width:44px}.overview-search input{width:0;opacity:0;pointer-events:none}.overview-search:focus-within{position:absolute;top:75px;left:20px;right:20px;width:auto;z-index:5;background:#f5f3f9;padding:8px 15px}.overview-search:focus-within input{width:100%;opacity:1;pointer-events:auto}.overview-chat::after{transform:rotate(2deg)}}
+@media(min-width:1201px){
+ body:has(.overview-page)>.site-main{padding-bottom:12px}
+ .overview-header nav{left:calc(50% - 20px)}
+ .overview-intro h1{letter-spacing:0}
+ .overview-chat::before{border-color:#ffffff75;box-shadow:none;inset:-49px 82px 9px 65px;transform:rotate(1deg)}
+ .overview-chat::after{border-color:#ffffff75;box-shadow:none}
+ .overview-folder-tab{position:absolute;left:0;top:-34px;width:275px;height:60px;border-radius:26px 24px 0 0;background:linear-gradient(125deg,#ffffffa6,#ffffff61);border-top:1px solid #fff;z-index:-1;clip-path:polygon(0 0,83% 0,100% 58%,100% 100%,0 100%);backdrop-filter:blur(18px)}
+ .overview-login-note{position:absolute;bottom:-28px;left:0;width:100%;margin:0;font-size:10px}
+ .overview-footer{margin-top:12px}
+}
