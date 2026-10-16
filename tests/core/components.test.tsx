@@ -44,6 +44,7 @@ test("core component recovery and separate permission controls", async (t) => {
     await import("../../src/components/core/session-boundary");
   const { IdentityContext } = await import("../../src/lib/core/client");
   const { JournalReview } = await import("../../src/components/core/journal-review");
+  const { ConfirmEmail } = await import("../../src/components/core/account");
   const userId = randomUUID(),
     id = randomUUID();
   const entry = {
@@ -57,6 +58,36 @@ test("core component recovery and separate permission controls", async (t) => {
     updated_at: "2026-01-01T00:00:00Z",
   };
   try {
+    await t.test("PKCE confirmation waits for an explicit click and does not claim success on failure", async () => {
+      let calls = 0;
+      globalThis.fetch = async (url, options) => {
+        calls++;
+        assert.equal(url, "/api/auth/confirm");
+        assert.equal(options?.method, "POST");
+        assert.deepEqual(JSON.parse(options?.body as string), { code: "synthetic-pkce-code" });
+        return Response.json({ error: { code: "CONFIRM_FAILED", message: "synthetic confirmation failure" } }, { status: 400 });
+      };
+      const view = render(<ConfirmEmail tokenHash="" code="synthetic-pkce-code"/>);
+      assert.equal(calls, 0);
+      fireEvent.click(view.getByRole("button", { name: /^确认邮箱$/ }));
+      await waitFor(()=>assert.ok(view.getByRole("alert")));
+      assert.equal(calls, 1);
+      assert.equal((view.getByRole("button", { name: /^确认邮箱$/ }) as HTMLButtonElement).disabled, false);
+      cleanup();
+    });
+    await t.test("real overview presentation refreshes saved entries without changing source permissions", async () => {
+      let reads = 0;
+      globalThis.fetch = async () => Response.json({ entries: ++reads === 1 ? [] : [{ ...entry, title: "newly saved synthetic entry" }], nextCursor: null });
+      const view = render(<IdentityContext value={userId}><JournalTimeline presentation="overview"/></IdentityContext>);
+      await waitFor(()=>assert.ok(view.getByText("还没有保存的生活记录")));
+      await act(async()=>{ window.dispatchEvent(new dom.window.Event("memonest:entries-changed")); });
+      await waitFor(()=>assert.ok(view.getByText("newly saved synthetic entry")));
+      assert.equal(reads, 2);
+      fireEvent.click(view.getByRole("button", { name: "网格视图" }));
+      assert.equal(view.getByRole("button", { name: "网格视图" }).getAttribute("aria-pressed"), "true");
+      assert.ok(view.getByText("Saved"));
+      cleanup();
+    });
     await t.test("AI review requires separate consent, reports failure and discards cancelled late output", async () => {
       let calls = 0;
       let complete!: (response: Response) => void;

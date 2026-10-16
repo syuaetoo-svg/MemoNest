@@ -21,8 +21,8 @@ export default async function HomePage({ searchParams }: { searchParams: Promise
       <div className="overview-life">
         <div className="overview-intro"><div><p className="overview-kicker">{today}</p><h1>A little space for your everyday.</h1></div><Link href="/journal" className="overview-new"><Plus size={17} aria-hidden="true"/>New entry</Link></div>
         <section className="overview-moments overview-glass" aria-labelledby="moments-title">
-          <div className="overview-section-heading"><h2 id="moments-title">Your moments</h2><BookOpen size={20} aria-hidden="true"/></div>
-          {authenticated ? <JournalTimeline key={query} initialQuery={query}/> : <>
+          <div className="overview-section-heading"><h2 id="moments-title">Your moments</h2>{!authenticated && <BookOpen size={20} aria-hidden="true"/>}</div>
+          {authenticated ? <JournalTimeline key={query} initialQuery={query} presentation="overview"/> : <>
             <div className="overview-tabs"><span>All entries</span><span><LockKeyhole size={13} aria-hidden="true"/>Private by default</span></div>
             <div className="overview-empty"><span className="overview-empty-mark"><BookOpen size={30} strokeWidth={1.2} aria-hidden="true"/></span><h3>给日常，留一点位置</h3><p>{state.kind === "unavailable" ? "暂时无法验证会话，请稍后重试。没有读取你的私人内容。" : state.kind === "unconfigured" ? "记录服务尚未连接。连接后登录，即可在这里查看自己的生活片段。" : "登录后，你保存的生活片段会出现在这里。\n一个小小的瞬间，就值得被留下。"}</p><Link className="overview-text-link" href={state.kind === "anonymous" ? "/account?returnTo=%2Fjournal" : "/journal"}>{state.kind === "anonymous" ? "Sign in to your space" : "Open journal"}<ArrowUpRight size={16} aria-hidden="true"/></Link></div>
           </>}
@@ -36,7 +36,7 @@ export default async function HomePage({ searchParams }: { searchParams: Promise
         <span className="overview-folder-tab" aria-hidden="true"/>
         <div className="overview-chat-heading"><div><h2 id="xiaoqi-title">Xiaoqi / 小栖</h2><p><span/>Here with you</p></div><Link href="/chat" aria-label="打开与小栖的完整对话" className="overview-chat-open"><ArrowUpRight size={19}/></Link></div>
         <div className="overview-cat overview-cat-reference" role="img" aria-label="小栖，珍珠白半透明小猫"><ReferenceAsset kind="cat"/></div>
-        {authenticated ? <div className="overview-live-chat"><details className="overview-chat-boundary"><summary>关于对话与记忆</summary><p>当前页临时对话，离开或刷新会清除。发送时使用最近 5 条用户表达和相关有效授权摘要；历史 AI 回复不会再次发送。私人保存与长期记忆授权分别确认。</p></details><ChatWorkspace configured={aiConfigured()}/></div> : <div className="overview-chat-welcome"><p className="overview-bubble">What would you like to remember today?</p><p className="overview-chat-note">一点心事，一件小事。<br/>从你愿意分享的地方开始。</p><Link href="/chat" className="overview-composer"><span>Leave a little thought…</span><span><ArrowRight size={22} aria-hidden="true"/></span></Link><p className="overview-login-note">登录并确认当次 AI 处理后，即可与小栖聊天。</p></div>}
+        {authenticated ? <div className="overview-live-chat"><details className="overview-chat-boundary"><summary>关于对话与记忆</summary><p>当前页临时对话，离开或刷新会清除。发送时使用最近 5 条用户表达和相关有效授权摘要；历史 AI 回复不会再次发送。私人保存与长期记忆授权分别确认。</p></details><ChatWorkspace configured={aiConfigured()} embedded/></div> : <div className="overview-chat-welcome"><p className="overview-bubble">What would you like to remember today?</p><p className="overview-chat-note">一点心事，一件小事。<br/>从你愿意分享的地方开始。</p><Link href="/chat" className="overview-composer"><span>Leave a little thought…</span><span><ArrowRight size={22} aria-hidden="true"/></span></Link><p className="overview-login-note">登录并确认当次 AI 处理后，即可与小栖聊天。</p></div>}
       </aside>
     </div>
     <footer className="overview-footer"><p><LockKeyhole size={13} aria-hidden="true"/>你的记录，由你决定。</p><Link href="/privacy">Privacy & permissions<ArrowUpRight size={13} aria-hidden="true"/></Link></footer>

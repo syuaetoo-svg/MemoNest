@@ -45,9 +45,10 @@ export const credentialsInput = z
     password: z.string().min(8, "密码至少 8 位").max(128),
   })
   .strict();
-export const confirmInput = z
-  .object({ tokenHash: z.string().min(1).max(512) })
-  .strict();
+export const confirmInput = z.union([
+  z.object({ tokenHash: z.string().min(1).max(512) }).strict(),
+  z.object({ code: z.string().min(1).max(512) }).strict(),
+]);
 export const journalFields =
   "id,title,body,event_date,version,undo_until,created_at,updated_at";
 export const memoryFields =

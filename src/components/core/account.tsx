@@ -159,14 +159,14 @@ export function SignedInAccount({
     </Card>
   );
 }
-export function ConfirmEmail({ tokenHash }: { tokenHash: string }) {
+export function ConfirmEmail({ tokenHash, code = "" }: { tokenHash: string; code?: string }) {
   const [busy, setBusy] = useState(false),
     [error, setError] = useState("");
   async function confirm() {
     setBusy(true);
     setError("");
     try {
-      await api("/api/auth/confirm", "POST", { tokenHash });
+      await api("/api/auth/confirm", "POST", tokenHash ? { tokenHash } : { code });
       window.location.replace(new URL("/journal", window.location.origin).href);
     } catch (e) {
       setError(messageOf(e));
@@ -180,13 +180,13 @@ export function ConfirmEmail({ tokenHash }: { tokenHash: string }) {
         只有你主动确认后才建立登录会话。确认链接只能使用一次。
       </p>
       <Feedback message={error} error />
-      <Button disabled={busy || !tokenHash} onClick={confirm}><Check size={16} aria-hidden="true" className="control-icon"/>
+      <Button disabled={busy || (!tokenHash && !code)} onClick={confirm}><Check size={16} aria-hidden="true" className="control-icon"/>
         {busy ? "正在确认…" : "确认邮箱"}
       </Button>
       <Link className="ml-4 text-sm underline" href="/account"><ArrowLeft size={16} aria-hidden="true" className="control-icon"/>
         返回登录
       </Link>
-      {!tokenHash && (
+      {!tokenHash && !code && (
         <Feedback message="链接缺少有效确认信息，请从注册邮件重新进入" error />
       )}
     </Card>

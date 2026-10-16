@@ -90,7 +90,7 @@ export function Evidence({
   );
 }
 type Turn = { id: string; text: string; result: ChatResult };
-export function ChatWorkspace({ configured }: { configured: boolean }) {
+export function ChatWorkspace({ configured, embedded = false }: { configured: boolean; embedded?: boolean }) {
   const api = useCoreApi();
   const [turns, setTurns] = useState<Turn[]>([]);
   const [text, setText] = useState("");
@@ -155,7 +155,7 @@ export function ChatWorkspace({ configured }: { configured: boolean }) {
     }
   }
   return (
-    <div className="chat-workspace grid items-start gap-6 lg:grid-cols-[240px_minmax(0,1fr)]">
+    <div className={`chat-workspace grid items-start gap-6 lg:grid-cols-[240px_minmax(0,1fr)] ${embedded ? "chat-workspace--embedded" : ""}`}>
       <Card className="companion-profile lg:sticky lg:top-6">
         <GlassCompanion size="small" state={busy ? "thinking" : turns.length ? "reply" : "idle"} />
         <p className="eyebrow">YOUR QUIET COMPANION</p>
@@ -196,7 +196,7 @@ export function ChatWorkspace({ configured }: { configured: boolean }) {
               {configured ? "AI 服务已配置" : "AI 服务未配置"}
             </span>
           </div>
-          {!turns.length && (
+          {!turns.length && (embedded ? <p className="overview-initial-bubble">今天，有什么想慢慢说给我听？</p> :
             <EmptyState
               title="从一句随意的话开始"
               description="想说一件小事，或只是理理思绪，都可以。值得留下的部分，由你选择。"
@@ -276,7 +276,7 @@ export function ChatWorkspace({ configured }: { configured: boolean }) {
               value={text}
               onChange={(e) => setText(e.target.value)}
               maxLength={2000}
-              rows={3}
+              rows={embedded ? 1 : 3}
               className={fieldClass}
               disabled={Boolean(busy) || !configured}
               placeholder="今天有一个瞬间，我想记下来…"
@@ -356,7 +356,10 @@ export function ChatWorkspace({ configured }: { configured: boolean }) {
                   body: candidate.body,
                   eventDate: "",
                 }}
-                onSaved={() => setSavedCandidate(true)}
+                onSaved={() => {
+                  setSavedCandidate(true);
+                  if (embedded) window.dispatchEvent(new Event("memonest:entries-changed"));
+                }}
               />
             )}
           </div>

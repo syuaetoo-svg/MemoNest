@@ -20,7 +20,7 @@ import { Card, EmptyState } from "@/components/ui";
 import { Button, Dialog, Feedback, fieldClass } from "./ui";
 import { MemoryPermission } from "./memories";
 import { JournalReview } from "./journal-review";
-import { BookOpen, Undo2, History, PenLine, X, Trash2, Save, Eye, RefreshCw, CalendarDays, Search, ArrowDown, ArrowLeft, ArrowUpRight, LockKeyhole } from "lucide-react";
+import { BookOpen, Undo2, History, PenLine, X, Trash2, Save, Eye, RefreshCw, CalendarDays, Search, ArrowDown, ArrowLeft, ArrowUpRight, LockKeyhole, List, LayoutGrid } from "lucide-react";
 
 export function EntryEditor({
   initial,
@@ -311,8 +311,11 @@ export function EntryEditor({
     </Card>
   );
 }
-export function JournalTimeline({ initialQuery = "" }: { initialQuery?: string } = {}) {
+export function JournalTimeline({ initialQuery = "", presentation = "default" }: { initialQuery?: string; presentation?: "default" | "overview" } = {}) {
   const api = useCoreApi();
+  const overview = presentation === "overview";
+  const [view, setView] = useState<"list" | "grid">("list");
+  const [period, setPeriod] = useState<"all" | "week">("all");
   const pageGeneration = useRef(0);
   const [query, setQuery] = useState(initialQuery),
     [activeQuery, setActiveQuery] = useState(initialQuery),
@@ -324,6 +327,16 @@ export function JournalTimeline({ initialQuery = "" }: { initialQuery?: string }
     entries: Entry[];
     nextCursor: string | null;
   }>(`/api/journal-entries?q=${encodeURIComponent(activeQuery)}`);
+  useEffect(() => {
+    if (!overview) return;
+    const update = () => {
+      pageGeneration.current++;
+      setExtra([]); setCursor(null); setLoadingMore(false); setMoreError("");
+      void refresh();
+    };
+    window.addEventListener("memonest:entries-changed", update);
+    return () => window.removeEventListener("memonest:entries-changed", update);
+  }, [overview, refresh]);
   async function more() {
     const next = cursor || data?.nextCursor;
     if (!next) return;
@@ -357,15 +370,23 @@ export function JournalTimeline({ initialQuery = "" }: { initialQuery?: string }
     setActiveQuery(query.trim());
   }
   const entries = data ? [...data.entries, ...extra] : [];
+  const monday = new Date();
+  monday.setHours(0, 0, 0, 0);
+  monday.setDate(monday.getDate() - (monday.getDay() + 6) % 7);
+  const visibleEntries = overview && period === "week" ? entries.filter(entry => new Date(`${entry.event_date}T12:00:00`) >= monday && entry.event_date <= localDate()) : entries;
   return (
-    <Card className="timeline-canvas">
-      <div className="flex flex-wrap items-center justify-between gap-3">
+    <Card className={`timeline-canvas ${overview ? `overview-records overview-records--${view}` : ""}`}>
+      {overview ? <div className="overview-record-toolbar">
+        <div className="overview-record-views" aria-label="记录显示方式"><button type="button" aria-label="列表视图" aria-pressed={view === "list"} onClick={()=>setView("list")}><List size={21}/></button><button type="button" aria-label="网格视图" aria-pressed={view === "grid"} onClick={()=>setView("grid")}><LayoutGrid size={20}/></button></div>
+        <div className="overview-record-filters" aria-label="记录日期筛选"><button type="button" aria-pressed={period === "all"} onClick={()=>setPeriod("all")}>All entries</button><button type="button" aria-pressed={period === "week"} onClick={()=>setPeriod("week")}>This week</button><span title="这里展示的均为已私人保存的记录；没有额外的收藏权限或状态">Saved</span></div>
+        <p className={`overview-record-hint ${period === "all" ? "overview-record-hint--quiet" : ""}`}>私人保存 · {period === "week" ? "本周筛选作用于已加载记录，可继续加载更早记录。" : "不会自动授权小栖使用。"}</p>
+      </div> : <div className="flex flex-wrap items-center justify-between gap-3">
         <h2 className="text-xl font-semibold">私人记录时间线</h2>
         <Link className="primary-link" href="/journal"><PenLine size={16} aria-hidden="true" className="control-icon"/>
           写下新片刻
         </Link>
-      </div>
-      <form className="my-5 flex flex-wrap gap-3" onSubmit={search}>
+      </div>}
+      {(!overview || activeQuery) && <form className="my-5 flex flex-wrap gap-3" onSubmit={search}>
         <label className="min-w-0 flex-1">
           <span className="mb-2 block text-sm">原文关键词</span>
           <input
@@ -391,10 +412,10 @@ export function JournalTimeline({ initialQuery = "" }: { initialQuery?: string }
         ><X size={16} aria-hidden="true" className="control-icon"/>
           清除筛选
         </Button>
-      </form>
-      <p className="mb-4 text-sm text-muted">
+      </form>}
+      {!overview && <p className="mb-4 text-sm text-muted">
         按事件日期倒序；同日按创建时间排序。默认不供角色使用。
-      </p>
+      </p>}
       {loading && <p role="status">正在加载私人记录…</p>}
       <Feedback message={error} error />
       {error && (
@@ -408,9 +429,9 @@ export function JournalTimeline({ initialQuery = "" }: { initialQuery?: string }
           重试加载
         </Button>
       )}
-      {!loading && !error && entries.length === 0 && (
+      {!loading && !error && visibleEntries.length === 0 && (
         <EmptyState
-          title={activeQuery ? "没有找到匹配记录" : "还没有保存的生活记录"}
+          title={activeQuery ? "没有找到匹配记录" : period === "week" ? "已加载的记录中还没有本周片段" : "还没有保存的生活记录"}
           description={
             activeQuery
               ? "换个关键词，或清除筛选；这里不会生成不存在的经历。"
@@ -419,12 +440,14 @@ export function JournalTimeline({ initialQuery = "" }: { initialQuery?: string }
         />
       )}
       <div className="timeline-story space-y-3">
-        {entries.map((entry) => (
+        {visibleEntries.map((entry) => (
           <Link
             key={entry.id}
             href={`/journal/${entry.id}`}
             className="timeline-fragment glass-feature block p-5"
           >
+            {overview && <span className="overview-note-cover" aria-hidden="true"><BookOpen size={32} strokeWidth={1.2}/><small>Private note</small></span>}
+            <div className={overview ? "overview-entry-copy" : undefined}>
             <p className="fragment-date text-sm text-muted"><CalendarDays size={14} aria-hidden="true"/>{entry.event_date} · 私人记录</p>
             <h3 className="my-2 break-words font-semibold">
               {entryTitle(entry)}
@@ -434,7 +457,7 @@ export function JournalTimeline({ initialQuery = "" }: { initialQuery?: string }
             </p>
             <span className="mt-3 block text-sm text-sage-dark">
               <span className="icon-link"><BookOpen size={14} aria-hidden="true"/>查看全文与权限<ArrowUpRight size={14} aria-hidden="true"/></span>
-            </span>
+            </span></div>
           </Link>
         ))}
       </div>
