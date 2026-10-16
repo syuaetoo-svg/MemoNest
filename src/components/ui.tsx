@@ -17,9 +17,9 @@ export function FeatureLink({ href, title, description, children }: { href: stri
 }
 
 export function PhaseNotice() {
-  return <p className="flex items-start gap-2 rounded-2xl bg-paper px-4 py-3 text-sm leading-6 text-muted"><LockKeyhole size={16} className="mt-1 shrink-0" aria-hidden="true" />你可以直接记录生活，或在同意当次处理后使用 AI。私人保存与角色授权分别管理。</p>;
+  return <p className="flex items-start gap-2 rounded-2xl bg-paper px-4 py-3 text-sm leading-6 text-muted"><LockKeyhole size={16} className="mt-1 shrink-0" aria-hidden="true" />Write on your own or consent to AI processing for this request. Saving and memory permission are separate.</p>;
 }
 
-export function EmptyState({ title, description }: { title: string; description: string }) {
-  return <div className="empty-state flex min-h-64 flex-col items-center justify-center px-4 py-10 text-center"><GlassCompanion size="small" /><h2 className="text-xl font-semibold">{title}</h2><p className="mt-3 max-w-md text-sm leading-7 text-muted">{description}</p></div>;
+export function EmptyState({ title, description, showCompanion = true }: { title: string; description: string; showCompanion?: boolean }) {
+  return <div className="empty-state flex min-h-64 flex-col items-center justify-center px-4 py-10 text-center">{showCompanion && <GlassCompanion size="small" />}<h2 className="text-xl font-semibold">{title}</h2><p className="mt-3 max-w-md text-sm leading-7 text-muted">{description}</p></div>;
 }

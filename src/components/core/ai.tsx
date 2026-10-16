@@ -42,13 +42,13 @@ function Consent({
         onChange={(event) => onChange(event.target.checked)}
       />
       <span>
-        同意将{scope}发送给当前配置的 AI 服务商（Groq 或 OpenAI）完成本次 AI
-        处理。这不会自动保存记录或增加长期记忆授权。
+        I agree to send {scope} to the configured AI provider (Groq or OpenAI) for this request.
+         This does not save entries or grant long-term memory access.
         <span className="mt-1 block text-xs text-muted">
-          服务商可能按其安全政策保留内容；撤回长期记忆不能收回已发送的数据。
+          The provider may retain content under its safety policies. Revoking memory access cannot recall data already sent.
           <Link href="/privacy" className="icon-link underline">
             <ShieldCheck aria-hidden="true"/>
-            了解处理范围
+            What is shared
           </Link>
         </span>
       </span>
@@ -67,7 +67,7 @@ export function Evidence({
     <details className="evidence mt-4 rounded-xl border border-line p-3 text-xs leading-6">
       <summary className="cursor-pointer font-medium text-sage-dark">
         <Link2 aria-hidden="true"/>
-        查看来源依据（{citations.length}）
+        View sources ({citations.length})
       </summary>
       {citations.map((item, index) => {
         const source = sources.find((s) => s.id === item.sourceId);
@@ -80,7 +80,7 @@ export function Evidence({
             {source?.entryId && (
               <Link className="icon-link underline" href={`/journal/${source.entryId}`}>
                 <BookOpen aria-hidden="true"/>
-                打开原记录
+                Open source entry
               </Link>
             )}
           </blockquote>
@@ -159,47 +159,48 @@ export function ChatWorkspace({ configured, embedded = false }: { configured: bo
       <Card className="companion-profile lg:sticky lg:top-6">
         <GlassCompanion size="small" state={busy ? "thinking" : turns.length ? "reply" : "idle"} />
         <p className="eyebrow">YOUR QUIET COMPANION</p>
-        <h2 className="my-3 text-2xl font-semibold">小栖</h2>
+        <h2 className="my-3 text-2xl font-semibold">Xiaoqi</h2>
         <p className="text-sm leading-7 text-muted">
-          不急着总结你的人生。先听听，今天发生了什么。
+          No need to have it all figured out. What’s on your mind?
         </p>
         <details className="companion-boundary mt-5 border-t border-line pt-4 text-xs leading-6 text-muted">
-          <summary><Info size={14} aria-hidden="true"/>关于对话与记忆</summary>
+          <summary><Info size={14} aria-hidden="true"/>Chat & memory privacy</summary>
           <p className="mt-2">
-          AI 伙伴 · 当前页临时对话
+          AI companion · Chat stays on this page
           <br />
-          离开或刷新会清除聊天。发送时使用最近 5
-          条用户表达和相关有效授权摘要；历史 AI 回复不会再次发送。
+          Chat clears when you leave or refresh. Requests use your last five
+          messages and relevant authorized summaries. Earlier AI replies are not sent again.
           </p>
         </details>
         <Link
           className="mt-4 block text-sm text-sage-dark underline"
           href="/memories"
         >
-          管理小栖的记忆权限
+          Manage memory access
           <Sparkles aria-hidden="true"/>
         </Link>
         <Link
           className="mt-3 block text-sm text-sage-dark underline"
           href="/journal"
         >
-          也可以直接手写
+          Write an entry instead
           <BookOpen aria-hidden="true"/>
         </Link>
       </Card>
       <div className="min-w-0 space-y-5">
         <Card className="chat-surface">
           <div className="flex items-center justify-between border-b border-line pb-4">
-            <h2 className="font-medium"><MessageCircle size={17} aria-hidden="true"/>今天的小片刻</h2>
+            <h2 className="font-medium"><MessageCircle size={17} aria-hidden="true"/>Today’s moments</h2>
             <span className="chat-service">
               {configured ? <CircleCheck aria-hidden="true"/> : <CircleAlert aria-hidden="true"/>}
-              {configured ? "AI 服务已配置" : "AI 服务未配置"}
+              {configured ? "AI connected" : "AI not connected"}
             </span>
           </div>
-          {!turns.length && (embedded ? <p className="overview-initial-bubble">今天，有什么想慢慢说给我听？</p> :
+          {!turns.length && (embedded ? <p className="overview-initial-bubble">What would you like to share today?</p> :
             <EmptyState
-              title="从一句随意的话开始"
-              description="想说一件小事，或只是理理思绪，都可以。值得留下的部分，由你选择。"
+              showCompanion={false}
+              title="Start with a little thought"
+              description="Share a little moment or make room for a thought. You choose what to keep."
             />
           )}
           <div
@@ -210,7 +211,7 @@ export function ChatWorkspace({ configured, embedded = false }: { configured: bo
             {turns.map((turn) => (
               <div key={turn.id} className="space-y-3">
                 <div className="chat-user ml-5 rounded-2xl rounded-tr-sm p-4">
-                  <p className="mb-2 text-xs text-sage-dark">你</p>
+                  <p className="mb-2 text-xs text-sage-dark">You</p>
                   <p className="whitespace-pre-wrap break-words text-sm leading-7">
                     {turn.text}
                   </p>
@@ -231,11 +232,11 @@ export function ChatWorkspace({ configured, embedded = false }: { configured: bo
                         )
                       }
                     />
-                    <Bookmark aria-hidden="true"/>选入生活记录
+                    <Bookmark aria-hidden="true"/>Add to draft
                   </label>
                 </div>
                 <div className="chat-reply mr-5 rounded-2xl rounded-tl-sm p-4">
-                  <p className="mb-2 text-xs text-sage-dark"><GlassCompanion size="mark" state="reply" />小栖 · AI</p>
+                  <p className="mb-2 text-xs text-sage-dark"><GlassCompanion size="mark" state="reply" />Xiaoqi · AI</p>
                   <p className="whitespace-pre-wrap break-words text-sm leading-7">
                     {turn.result.reply}
                   </p>
@@ -252,13 +253,13 @@ export function ChatWorkspace({ configured, embedded = false }: { configured: bo
               <GlassCompanion size="mark" state="thinking" />
               <LoaderCircle aria-hidden="true"/>
               {busy === "chat"
-                ? "小栖正在认真读你的话…"
-                : "正在整理你选中的原话…"}
+                ? "Xiaoqi is listening…"
+                : "Putting your selected thoughts together…"}
             </p>
           )}
           <Feedback error message={error} />
           {!configured && (
-            <Feedback message="模型尚未配置，当前不会生成模拟回复。直接记录功能仍可独立使用。" />
+            <Feedback message="AI is not connected yet. You can still write and save an entry yourself." />
           )}
           <form
             onSubmit={(event) => {
@@ -269,7 +270,7 @@ export function ChatWorkspace({ configured, embedded = false }: { configured: bo
           >
             <label htmlFor="chat-message" className="block text-sm font-medium">
               <MessageCircle aria-hidden="true"/>
-              想对小栖说的话
+              A thought to share
             </label>
             <textarea
               id="chat-message"
@@ -279,13 +280,13 @@ export function ChatWorkspace({ configured, embedded = false }: { configured: bo
               rows={embedded ? 1 : 3}
               className={fieldClass}
               disabled={Boolean(busy) || !configured}
-              placeholder="今天有一个瞬间，我想记下来…"
+              placeholder="There’s a moment I’d like to keep…"
             />
             <Consent
               checked={consent}
               onChange={setConsent}
               disabled={Boolean(busy) || !configured}
-              scope="本页最近的用户表达、相关有效授权摘要；整理时仅发送选中的用户原话"
+              scope="your recent messages and relevant authorized summaries; for a draft, only your selected words"
             />
             <div className="flex flex-wrap gap-3">
               <Button
@@ -295,7 +296,7 @@ export function ChatWorkspace({ configured, embedded = false }: { configured: bo
                 type="submit"
               >
                 <Send size={15} className="mr-2 inline" aria-hidden="true" />
-                {error ? "重试发送" : "发送"}
+                {error ? "Try sending again" : "Send"}
               </Button>
               <Button
                 type="button"
@@ -314,7 +315,7 @@ export function ChatWorkspace({ configured, embedded = false }: { configured: bo
                   className="mr-2 inline"
                   aria-hidden="true"
                 />
-                整理所选原话（{selected.length}）
+                Create draft ({selected.length})
               </Button>
             </div>
           </form>
@@ -322,10 +323,10 @@ export function ChatWorkspace({ configured, embedded = false }: { configured: bo
         {candidate && (
           <div className="space-y-4">
             <Card>
-              <h2 className="text-lg font-semibold">先校对，再决定留下</h2>
+              <h2 className="text-lg font-semibold">Review before you keep it</h2>
               <p className="mt-3 text-sm leading-7">
                 {candidate.note ||
-                  "请核对原话、正文和发生日期。保存不等于授权小栖记住。"}
+                  "Check the wording and date. Saving does not give Xiaoqi memory access."}
               </p>
               <Evidence
                 citations={candidate.evidence}
@@ -338,7 +339,7 @@ export function ChatWorkspace({ configured, embedded = false }: { configured: bo
                   if (
                     !savedCandidate &&
                     candidate.body &&
-                    !window.confirm("放弃这份尚未保存的候选？")
+                    !window.confirm("Discard this unsaved draft?")
                   )
                     return;
                   setCandidate(null);
@@ -346,7 +347,7 @@ export function ChatWorkspace({ configured, embedded = false }: { configured: bo
                 }}
               >
                 {savedCandidate ? <ChevronUp size={16} aria-hidden="true"/> : <X size={16} aria-hidden="true"/>}
-                {savedCandidate ? "收起已保存记录" : "放弃候选"}
+                {savedCandidate ? "Close saved entry" : "Discard draft"}
               </Button>
             </Card>
             {candidate.body && (
@@ -418,10 +419,10 @@ export function ReviewWorkspace({ configured }: { configured: boolean }) {
     <div className="review-workspace">
       <Card className="review-selection">
         <p className="eyebrow">CHOOSE YOUR MOMENTS</p>
-        <h2 className="my-3 text-xl font-semibold">只回顾你选中的生活</h2>
+        <h2 className="my-3 text-xl font-semibold">Choose your moments</h2>
         <p className="mb-5 text-sm leading-7 text-muted">
-          最多 8
-          篇。选择范围改变后，需要重新同意本次处理；不会改变任何长期记忆权限。
+          Choose up to eight
+          entries. Changing your selection resets consent for this request. Long-term memory permissions stay unchanged.
         </p>
         <form
           className="mb-5 flex gap-2"
@@ -432,30 +433,30 @@ export function ReviewWorkspace({ configured }: { configured: boolean }) {
           }}
         >
           <input
-            aria-label="搜索要回顾的记录"
+            aria-label="Search entries for your reflection"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             maxLength={200}
             className={fieldClass}
-            placeholder="搜索一个人、一件事…"
+            placeholder="Search a person, a moment…"
           />
           <Button tone="secondary" type="submit"><Search size={16} aria-hidden="true" className="control-icon"/>
-            查找
+            Search
           </Button>
         </form>
-        {resource.loading && <p role="status">正在读取记录…</p>}
+        {resource.loading && <p role="status">Loading entries…</p>}
         {resource.error && (
           <>
             <Feedback error message={resource.error} />
             <Button tone="secondary" onClick={resource.refresh}><RefreshCw size={16} aria-hidden="true" className="control-icon"/>
-              重新加载
+              Reload
             </Button>
           </>
         )}
         {resource.data && !resource.data.entries.length && (
           <EmptyState
-            title="这里还没有匹配的片刻"
-            description="试试别的关键词，或先写下第一篇记录。"
+            title="No matching moments yet"
+            description="Try another search or write your first entry."
           />
         )}
         <div className="space-y-3">
@@ -492,7 +493,7 @@ export function ReviewWorkspace({ configured }: { configured: boolean }) {
         <div className="mt-4 flex gap-3">
           {cursor && (
             <Button tone="secondary" onClick={() => setCursor(null)}><ArrowLeft size={16} aria-hidden="true" className="control-icon"/>
-              回到第一页
+              First page
             </Button>
           )}
           {resource.data?.nextCursor && (
@@ -500,7 +501,7 @@ export function ReviewWorkspace({ configured }: { configured: boolean }) {
               tone="secondary"
               onClick={() => setCursor(resource.data!.nextCursor)}
             ><ArrowDown size={16} aria-hidden="true" className="control-icon"/>
-              下一页
+              Next page
             </Button>
           )}
         </div>
@@ -508,7 +509,7 @@ export function ReviewWorkspace({ configured }: { configured: boolean }) {
       <div className="review-narrative space-y-5">
         <Card className="review-plan">
           <h2 className="text-xl font-semibold">
-            本次回顾 · {selected.length} 篇
+            Your reflection · {selected.length} entries
           </h2>
           <ul className="my-4 space-y-2 text-sm">
             {selected.map((entry) => (
@@ -524,7 +525,7 @@ export function ReviewWorkspace({ configured }: { configured: boolean }) {
                   disabled={busy}
                   onClick={() => choose(entry)}
                 ><X size={16} aria-hidden="true" className="control-icon"/>
-                  移除
+                  Remove
                 </button>
               </li>
             ))}
@@ -533,18 +534,18 @@ export function ReviewWorkspace({ configured }: { configured: boolean }) {
             checked={consent}
             onChange={setConsent}
             disabled={busy || !selected.length || !configured}
-            scope={`上方选中的 ${selected.length} 篇记录全文`}
+            scope={`the ${selected.length} selected entries in full`}
           />
           <Button
             className="mt-4"
             disabled={busy || !consent || !selected.length || !configured}
             onClick={createReview}
           ><History size={16} aria-hidden="true" className="control-icon"/>
-            {busy ? "正在回望这些片刻…" : "生成本次回顾"}
+            {busy ? "Creating your reflection…" : "Create reflection"}
           </Button>
           {!configured && (
             <p className="mt-4 text-sm text-muted">
-              AI 服务未配置。你仍可在时间线查看原记录。
+              AI is not connected yet. You can still read your original entries in the timeline.
             </p>
           )}
           <div className="mt-4">
@@ -554,15 +555,15 @@ export function ReviewWorkspace({ configured }: { configured: boolean }) {
             href="/memories"
             className="mt-4 block text-sm text-sage-dark underline"
           ><ArrowLeft size={16} aria-hidden="true" className="control-icon"/>
-            回到私人时间线
+            Back to your timeline
           </Link>
         </Card>
         {result && (
           <Card className="review-story">
-            <p className="eyebrow">A LOOK BACK · AI 生成</p>
+            <p className="eyebrow">A LOOK BACK · AI generated</p>
             <h2 className="my-4 text-2xl font-semibold">{result.title}</h2>
             <p className="mb-4 text-xs text-muted">
-              仅根据本次所选记录生成，未保存。请对照原文核实；来源真实不代表概括绝无误差。
+              Based only on your selected entries and not saved. Check the original text: a real source does not make every interpretation accurate.
             </p>
             {result.moments.map((moment, index) => (
               <div key={index} className="timeline-moment py-5">

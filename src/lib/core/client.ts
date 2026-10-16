@@ -1,4 +1,5 @@
 "use client";
+import { interfaceFeedback } from "./interface-copy";
 import {
   createContext,
   useContext,
@@ -39,7 +40,7 @@ export async function api<T>(
   } catch {
     throw new ClientError(
       "NETWORK_ERROR",
-      "网络中断，操作尚未确认。请保留当前页面并重试",
+      "Connection lost. Keep this page open and try again; the action is not confirmed.",
       0,
     );
   }
@@ -47,19 +48,19 @@ export async function api<T>(
   if (!response.ok)
     throw new ClientError(
       result?.error?.code || "SERVICE_ERROR",
-      result?.error?.message || "操作尚未确认，请重试",
+      interfaceFeedback(result?.error?.message || "The action is not confirmed. Please try again.", result?.error?.code),
       response.status,
     );
   if (!result)
     throw new ClientError(
       "SERVICE_ERROR",
-      "服务返回无效，操作尚未确认，请重试",
+      "The service returned an invalid response. Please try again.",
       response.status,
     );
   return result as T;
 }
 export function messageOf(error: unknown) {
-  return error instanceof Error ? error.message : "操作尚未确认，请重试";
+  return error instanceof Error ? error.message : "The action is not confirmed. Please try again.";
 }
 export const IdentityContext = createContext<string | null>(null);
 export function useCoreApi() {
@@ -128,7 +129,7 @@ export function useUnsavedGuard(dirty: boolean) {
       if (!target) return;
       const href = target.getAttribute("href");
       if (!href || href.startsWith("#")) return;
-      if (!window.confirm("离开将丢失当前未保存内容，确定离开吗？")) {
+      if (!window.confirm("Leave this page and discard your unsaved changes?")) {
         event.preventDefault();
         event.stopPropagation();
       }

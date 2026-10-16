@@ -6,6 +6,5 @@ export function GlassCompanion({ size = "large", state = "idle" }: { size?: "lar
    <span className="cat-life">
      <ReferenceAsset kind="cat" className="xiaoqi-render"/>
    </span>
-   {size !== "mark" && <span className="character-ripple"/>}
  </span>;
 }

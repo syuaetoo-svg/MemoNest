@@ -62,7 +62,7 @@ test("AI UI contracts with explicit mock transport (not live model acceptance)",
                 { status: 503 },
               );
             return Response.json({
-              reply: "AI test reply",
+              reply: "验收测试：我听到了。",
               citations: [],
               sources: [],
             });
@@ -81,27 +81,27 @@ test("AI UI contracts with explicit mock transport (not live model acceptance)",
             <ChatWorkspace configured />
           </IdentityContext>,
         );
-        fireEvent.change(view.getByLabelText("想对小栖说的话"), {
+        fireEvent.change(view.getByLabelText("A thought to share"), {
           target: { value: "我去了公园" },
         });
         assert(
-          (view.getByRole("button", { name: "发送" }) as HTMLButtonElement)
+          (view.getByRole("button", { name: "Send" }) as HTMLButtonElement)
             .disabled,
         );
         fireEvent.click(view.getByRole("checkbox"));
-        fireEvent.click(view.getByRole("button", { name: "发送" }));
+        fireEvent.click(view.getByRole("button", { name: "Send" }));
         await waitFor(() =>
-          assert(view.getByRole("alert").textContent?.includes("模型暂不可用")),
+          assert(view.getByRole("alert").textContent?.includes("AI is temporarily unavailable")),
         );
         assert.equal(
-          (view.getByLabelText("想对小栖说的话") as HTMLTextAreaElement).value,
+          (view.getByLabelText("A thought to share") as HTMLTextAreaElement).value,
           "我去了公园",
         );
-        fireEvent.click(view.getByRole("button", { name: "重试发送" }));
-        await waitFor(() => assert(view.getByText("AI test reply")));
-        assert.equal(view.getAllByText("你", { exact: true }).length, 1);
-        fireEvent.click(view.getByLabelText("选入生活记录"));
-        fireEvent.click(view.getByRole("button", { name: /整理所选原话/ }));
+        fireEvent.click(view.getByRole("button", { name: "Try sending again" }));
+        await waitFor(() => assert(view.getByText("验收测试：我听到了。")));
+        assert.equal(view.getAllByText("You", { exact: true }).length, 1);
+        fireEvent.click(view.getByLabelText("Add to draft"));
+        fireEvent.click(view.getByRole("button", { name: /Create draft/ }));
         await waitFor(() => assert(view.getByText("请确认日期")));
         const draft = sent.find((r) => r.path.endsWith("/draft"))!;
         const messages = draft.data.messages as { text: string }[];
@@ -110,7 +110,7 @@ test("AI UI contracts with explicit mock transport (not live model acceptance)",
           ["我去了公园"],
         );
         assert.equal(
-          (view.getByLabelText("事情发生的日期") as HTMLInputElement).value,
+          (view.getByLabelText("Date of your moment") as HTMLInputElement).value,
           "",
         );
         assert(sent.every((r) => r.path.startsWith("/api/ai/")));
@@ -148,7 +148,7 @@ test("AI UI contracts with explicit mock transport (not live model acceptance)",
         assert(
           !(
             view.getByRole("button", {
-              name: "生成本次回顾",
+              name: "Create reflection",
             }) as HTMLButtonElement
           ).disabled,
         );
@@ -156,7 +156,7 @@ test("AI UI contracts with explicit mock transport (not live model acceptance)",
         assert(
           (
             view.getByRole("button", {
-              name: "生成本次回顾",
+              name: "Create reflection",
             }) as HTMLButtonElement
           ).disabled,
         );

@@ -7,15 +7,15 @@ import { accountState } from "@/lib/server/supabase";
 import { aiConfigured } from "@/lib/server/ai-provider";
 import { GlassCompanion } from "@/components/glass-companion";
 export const dynamic = "force-dynamic";
-export const metadata: Metadata = { title: "和小栖聊聊" };
+export const metadata: Metadata = { title: "Chat with Xiaoqi" };
 export default async function ChatPage() {
   const state = await accountState();
   return (
     <>
       <PageHeading
         eyebrow="WITH XIAOQI"
-        title="和小栖，慢慢聊"
-        description="不必组织好语言。聊聊今天，再把想留下的片刻，变成属于自己的生活记录。"
+        title="A little chat with Xiaoqi"
+        description="Start with a thought. Keep the moments you want to return to."
       />
       {state.kind === "authenticated" ? (
         <SessionBoundary key={state.userId} userId={state.userId}>

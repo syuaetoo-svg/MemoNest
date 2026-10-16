@@ -7,6 +7,7 @@ import {
   type ReactNode,
 } from "react";
 import { GlassButton } from "@/components/glass";
+import { interfaceFeedback } from "@/lib/core/interface-copy";
 export const fieldClass =
   "glass-field w-full min-w-0 px-4 py-3 text-base";
 export function Button({
@@ -39,7 +40,7 @@ export function Feedback({
       role={error ? "alert" : "status"}
       className={`rounded-xl p-4 text-sm leading-6 ${error ? "bg-[#fbecec] text-[#8a3030]" : "bg-sage-light text-sage-dark"}`}
     >
-      {message}
+      {interfaceFeedback(message)}
     </p>
   ) : null;
 }

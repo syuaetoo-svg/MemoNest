@@ -11,7 +11,7 @@ const labels: Record<string, string> = { "/": "Overview", "/chat": "Chat", "/jou
 export function Navigation() {
   const pathname = usePathname();
   return (
-    <nav aria-label="主导航" className="floating-nav">
+    <nav aria-label="Main navigation" className="floating-nav">
       {navigation.map(({ href, label, icon }) => {
         const Icon = href === "/review" ? History : icons[icon];
         const active = pathname === href;

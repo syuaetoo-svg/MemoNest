@@ -1,8 +1,8 @@
 @import "tailwindcss";
 @theme inline {
- --color-paper:#fff1df; --color-surface:#fff7ed; --color-ink:#594044; --color-muted:#795e60;
- --color-line:#c9a79a; --color-sage:#ba8372; --color-sage-dark:#875448; --color-sage-light:#f7dfcf;
- --color-clay:#b87362; --color-clay-light:#f7e2d6; --font-sans:"DM Sans","Noto Sans SC",sans-serif;
+ --color-paper:#faf9fc; --color-surface:#fdfcfe; --color-ink:#292930; --color-muted:#777b8c;
+ --color-line:#e1dfe9; --color-sage:#b8a1cc; --color-sage-dark:#6c5c7e; --color-sage-light:#f0eaf5;
+ --color-clay:#9a82b0; --color-clay-light:#f3edf7; --font-sans:"DM Sans","Noto Sans SC",sans-serif;
 }
 @font-face { font-family:"Smiley Sans"; src:url('/fonts/smiley-sans.woff2') format('woff2'); font-display:swap; }
 :root {

@@ -6,15 +6,15 @@ import { EntryEditor } from "@/components/core/journal";
 import { AccessGate } from "@/components/core/access-gate";
 import { accountState } from "@/lib/server/supabase";
 export const dynamic = "force-dynamic";
-export const metadata: Metadata = { title: "生活记录" };
+export const metadata: Metadata = { title: "Journal" };
 export default async function JournalPage() {
   const state = await accountState();
   return (
     <>
       <PageHeading
         eyebrow="LIFE, ONE MOMENT AT A TIME"
-        title="把生活，轻轻写下来"
-        description="一次散步、一顿晚餐、一个新的决定。先保存给自己，再决定是否单独授权小栖记住。"
+        title="A moment to keep"
+        description="Save a moment for yourself. Choose separately what Xiaoqi may remember."
       />
       {state.kind === "authenticated" ? (
         <SessionBoundary key={state.userId} userId={state.userId}>
