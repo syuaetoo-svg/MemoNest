@@ -43,7 +43,7 @@ body:has(.overview-page)::before{background:radial-gradient(ellipse at 85% 76%,#
  .overview-intro h1{font-size:44px;line-height:1.3;letter-spacing:-.025em;white-space:nowrap}
  .overview-new{position:absolute;right:0;bottom:9px;width:155px;height:50px;font-size:16px;padding:10px 16px}
  .overview-intro h1{max-width:calc(100% - 167px);font-size:clamp(29px,2.86vw,44px)}
- .overview-moments{height:492px;min-height:492px;padding:26px 32px;overflow:auto;scrollbar-width:thin}
+ .overview-moments{min-height:492px;padding:26px 32px}
  .overview-section-heading h2{font-size:30px}.overview-tabs{margin-top:17px;font-size:16px;gap:24px}
  .overview-tabs>span:first-child{padding:8px 23px}.overview-empty{min-height:341px}.overview-empty h3{font-size:21px}.overview-empty p{font-size:15px}.overview-text-link{font-size:14px}
  .overview-bottom{margin-top:20px;gap:16px;grid-template-columns:1.06fr 1fr}
@@ -62,7 +62,7 @@ body:has(.overview-page)::before{background:radial-gradient(ellipse at 85% 76%,#
  .overview-chat-note{margin:35px 4px 0;color:#94869e;font-size:14px}
  .overview-composer{min-height:88px;padding:14px 17px 14px 29px;border-radius:33px;font-size:17px;margin-top:auto}.overview-composer>span:last-child{width:60px;height:60px}
  .overview-login-note{font-size:10px;margin-top:8px}.overview-footer{margin-top:25px}
- .overview-live-chat{margin-top:223px;overflow-y:auto;scrollbar-width:thin;padding:0 1px 8px}
+ .overview-live-chat{margin-top:223px;padding:0 1px 8px}
 }
 /* Local refraction is translucent, never a full-page purple wash. */
 .overview-glass{background:linear-gradient(125deg,#ffffffb5,#ffffff6b);border-color:#ffffffda;box-shadow:inset 0 1px 1px #fff,0 14px 40px -20px #75758f24}
@@ -81,3 +81,7 @@ body:has(.overview-page)::before{background:radial-gradient(ellipse at 85% 76%,#
  .overview-login-note{position:absolute;bottom:-28px;left:0;width:100%;margin:0;font-size:10px}
  .overview-footer{margin-top:12px}
 }
+/* Missing reference assets are explicit; the disallowed old cat is not rendered. */
+.overview-cat-pending{align-items:flex-end;justify-content:center;min-width:158px;min-height:193px;color:#9c91a5;font-size:10px;padding-bottom:8px}
+.overview-chat:has(.overview-live-chat){height:auto;min-height:754px}
+.overview-page[data-reference-demo] .overview-avatar{background:#eeebf1;color:#a39baa}
