@@ -157,7 +157,7 @@ export function ChatWorkspace({ configured, embedded = false }: { configured: bo
   return (
     <div className={`chat-workspace grid items-start gap-6 lg:grid-cols-[240px_minmax(0,1fr)] ${embedded ? "chat-workspace--embedded" : ""}`}>
       <Card className="companion-profile lg:sticky lg:top-6">
-        <GlassCompanion size="small" state={busy ? "thinking" : turns.length ? "reply" : "idle"} />
+        <GlassCompanion size="small" pose="playing" state={busy ? "thinking" : turns.length ? "reply" : "idle"} />
         <p className="eyebrow">YOUR QUIET COMPANION</p>
         <h2 className="my-3 text-2xl font-semibold">Xiaoqi</h2>
         <p className="text-sm leading-7 text-muted">
@@ -198,7 +198,7 @@ export function ChatWorkspace({ configured, embedded = false }: { configured: bo
           </div>
           {!turns.length && (embedded ? <p className="overview-initial-bubble">What would you like to share today?</p> :
             <EmptyState
-              showCompanion={false}
+              pose="reading"
               title="Start with a little thought"
               description="Share a little moment or make room for a thought. You choose what to keep."
             />

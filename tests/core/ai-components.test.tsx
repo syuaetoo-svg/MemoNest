@@ -81,6 +81,9 @@ test("AI UI contracts with explicit mock transport (not live model acceptance)",
             <ChatWorkspace configured />
           </IdentityContext>,
         );
+        assert.equal(view.container.querySelector('.companion-profile img')?.getAttribute('src'), '/brand/xiaoqi-playing.png');
+        assert.equal(view.container.querySelector('.chat-surface .empty-state img')?.getAttribute('src'), '/brand/xiaoqi-reading.png');
+        assert.equal(view.container.querySelectorAll('.character-ripple').length, 0);
         fireEvent.change(view.getByLabelText("A thought to share"), {
           target: { value: "我去了公园" },
         });

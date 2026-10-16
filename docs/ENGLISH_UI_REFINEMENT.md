@@ -10,18 +10,11 @@ This changes interface copy and visual hierarchy, not stored content, AI prompts
 - User entry titles/bodies, messages, AI replies, drafts, summaries, citations and historical data are rendered verbatim. The isolated reference demo retains its Chinese example content while its controls/disclosures are English.
 - Existing covers, row dividers, notebook spacing, weekday gradients, glass materials and Infinity + MemoNest branding are retained.
 - Removed the code-generated elliptical character ripple. Supplied pearl-white cat artwork and Overview pose are unchanged; only the existing very soft natural image/drop shadow remains.
-- Removed the duplicate mascot from Chat’s central empty state. The left character is retained pending matching action artwork. This is **not** completion of the requested pose variations.
+- Chat now uses the supplied Playing PNG in its profile and Reading PNG in its central empty state. Overview keeps its accepted sitting asset. See NAVIGATION_CHARACTER_ACCEPTANCE.md for the later asset integration and browser checks.
 
-## Required matching character artwork — pending
+## Matching character artwork
 
-Use the accepted Overview character as the model, preserving eyes, ears, proportions, tail and pearl-white material:
-
-1. Chat profile: subtle head tilt and one front paw raised, listening.
-2. Chat empty state: both paws holding a small pale-lavender journal, looking down.
-3. Memories, where already used: looking at a photo or holding a memory card.
-4. Reflections, where already used: looking back or holding a notebook.
-
-Available assets are seated front/three-quarter/rear views, not these actions. No substitute was generated, mirrored, rotated or represented as a new pose. Pose work waits for matching supplied/confirmed artwork.
+The later supplied Playing and Reading PNGs resolve both requested Chat actions. Both are integrated without retouching or pose simulation. Optional future Memories/Reflections actions still need matching artwork if requested; none was added in the current navigation/Chat task.
 
 ## Verification
 
@@ -34,4 +27,4 @@ Available assets are seated front/three-quarter/rear views, not these actions. N
 
 ## Remaining limits
 
-Character action replacements are pending matching assets. Previously documented email-confirmation and original-image-recovery blockers remain; no new registration, resend, migration, private-data inspection or authenticated end-to-end run was performed. Local preview is not a public deployment. PR #15 remains open and unmerged.
+Both requested Chat action replacements are integrated (see the later acceptance report). Previously documented email-confirmation and original-image-recovery blockers remain; no new registration, resend, migration, private-data inspection or authenticated end-to-end run was performed. Local preview is not a public deployment. PR #15 remains open and unmerged.

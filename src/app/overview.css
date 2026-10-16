@@ -128,7 +128,14 @@ body:has(.overview-page)::before{background:radial-gradient(ellipse at 85% 76%,#
 .overview-memory{--memory-art:116px;padding-right:calc(var(--memory-art) + 32px)!important}
 .overview-memory .overview-section-heading{position:static}
 .overview-memory .overview-section-heading>svg{position:absolute;right:27px;top:30px}
-.overview-notebook-reference{right:9px;top:27px;width:var(--memory-art);height:144px}
+.overview-memory .overview-notebook-reference{right:9px;top:27px;width:var(--memory-art);height:144px}
 .overview-memory-note{align-items:flex-start;line-height:1.7}
 @media(min-width:851px) and (max-width:1200px){.overview-bottom{grid-template-columns:1fr}.overview-memory{--memory-art:110px}}
-@media(max-width:500px){.overview-memory{--memory-art:92px}.overview-notebook-reference{right:5px;top:40px;height:120px}.overview-memory>p{font-size:12px}.overview-memory-note{font-size:11px}.overview-memory-note small{font-size:10px}.overview-week{justify-content:space-between;gap:3px}}
+@media(max-width:500px){.overview-memory{--memory-art:92px}.overview-memory .overview-notebook-reference{right:5px;top:40px;height:120px}.overview-memory>p{font-size:12px}.overview-memory-note{font-size:11px}.overview-memory-note small{font-size:10px}.overview-week{justify-content:space-between;gap:3px}}
+/* The same five-link Navigation is used by Overview and every inner page. */
+.overview-header nav a{justify-content:center;gap:0;flex-direction:row;padding-inline:14px}
+.overview-header nav a>svg{display:none}
+@media(min-width:1201px){.overview-header nav a{font-size:15px;padding-inline:16px}}
+@media(max-width:1200px) and (min-width:851px){.overview-header{flex-wrap:wrap}.overview-header nav{order:3;width:100%;justify-content:center}.overview-account{margin-left:auto}.overview-header nav a{flex:1}.overview-header{margin-bottom:30px}}
+@media(max-width:850px){.overview-header nav{left:auto;right:auto;bottom:auto;gap:0}.overview-header nav a{min-width:0;padding-inline:5px;font-size:12px;min-height:44px}}
+@media(max-width:360px){.overview-header nav a{font-size:10px;padding-inline:3px}}

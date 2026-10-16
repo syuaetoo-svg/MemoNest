@@ -6,6 +6,7 @@ import { SessionBoundary } from "@/components/core/session-boundary";
 import { accountState } from "@/lib/server/supabase";
 import { aiConfigured } from "@/lib/server/ai-provider";
 import { ReferenceOverview } from "@/components/reference-overview";
+import { Navigation } from "@/components/navigation";
 import { ReferenceAsset } from "@/components/reference-assets";
 import "./overview.css";
 export const dynamic = "force-dynamic";
@@ -42,7 +43,7 @@ export default async function HomePage({ searchParams }: { searchParams: Promise
     <footer className="overview-footer"><p><LockKeyhole size={13} aria-hidden="true"/>Your moments. Your choice.</p><Link href="/privacy">Privacy & permissions<ArrowUpRight size={13} aria-hidden="true"/></Link></footer>
   </>;
   return <div className="overview-page" data-reference-demo={referenceDemo || undefined}>
-    <header className="overview-header"><Link href="/" className="overview-brand" aria-label="MemoNest home"><InfinityIcon size={48} strokeWidth={1.3} aria-hidden="true"/>MemoNest</Link><nav aria-label="Main navigation">{[["/", "Overview"], ["/journal", "Journal"], ["/memories", "Memories"], ["/review", "Reflections"]].map(([href,label])=><Link key={href} href={href} aria-current={href === "/" ? "page" : undefined}>{label}</Link>)}</nav><div className="overview-account"><form action="/" className="overview-search" role="search"><button type="submit" aria-label="Search entries"><Search size={20} aria-hidden="true"/></button><input name="q" defaultValue={query} maxLength={200} aria-label="Search entries" placeholder="Search your memories…"/></form><Link href="/account" className="overview-avatar" aria-label="Account & sign in"><UserRound size={21} aria-hidden="true"/></Link></div></header>
+    <header className="overview-header"><Link href="/" className="overview-brand" aria-label="MemoNest home"><InfinityIcon size={48} strokeWidth={1.3} aria-hidden="true"/>MemoNest</Link><Navigation/><div className="overview-account"><form action="/" className="overview-search" role="search"><button type="submit" aria-label="Search entries"><Search size={20} aria-hidden="true"/></button><input name="q" defaultValue={query} maxLength={200} aria-label="Search entries" placeholder="Search your memories…"/></form><Link href="/account" className="overview-avatar" aria-label="Account & sign in"><UserRound size={21} aria-hidden="true"/></Link></div></header>
     {referenceDemo ? <ReferenceOverview/> : authenticated ? <SessionBoundary key={state.userId} userId={state.userId}>{content}</SessionBoundary> : content}
   </div>;
 }

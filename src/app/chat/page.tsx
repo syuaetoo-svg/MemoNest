@@ -22,7 +22,7 @@ export default async function ChatPage() {
           <ChatWorkspace configured={aiConfigured()} />
         </SessionBoundary>
       ) : (
-        <div className="chat-entrance"><div><GlassCompanion state="welcome"/><p className="hero-serif">Here, whenever you need a little company.</p></div><AccessGate state={state} returnTo="/chat" /></div>
+        <div className="chat-entrance"><div><GlassCompanion pose="playing" state="welcome"/><p className="hero-serif">Here, whenever you need a little company.</p></div><AccessGate state={state} returnTo="/chat" /></div>
       )}
     </>
   );
