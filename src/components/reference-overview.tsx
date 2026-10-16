@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState, type FormEvent } from "react";
 import { ArrowRight, ChevronRight, LayoutGrid, List, MoreHorizontal, Plus, Sparkles } from "lucide-react";
 import "@/app/reference-overview.css";
+import { ReferenceAsset } from "@/components/reference-assets";
 
 const entries = [
   { id: "sea", date: "OCT 16", title: "晚风很舒服", body: "下班后去河边走了一会儿，晚风很舒服，整个人都轻松了。", image: "海边照片素材待提供", saved: true },
@@ -36,7 +37,7 @@ export function ReferenceOverview() {
           <div className="reference-filters" aria-label="筛选演示记录">{["All entries", "This week", "Saved"].map(label=><button key={label} aria-pressed={filter === label} onClick={()=>setFilter(label)}>{label}</button>)}</div>
           <div className={`reference-entries reference-entries--${view}`}>
             {rows.map(entry=><article key={entry.id} className="reference-entry">
-              <div className="reference-photo-missing" role="img" aria-label={entry.image}><span>{entry.image}</span></div>
+              <div className="reference-photo-missing reference-photo" role="img" aria-label={entry.id === "sea" ? "演示配图：海边夕阳" : "演示配图：阳光下的桌面"}><ReferenceAsset kind={entry.id === "sea" ? "sea" : "desk"}/></div>
               <div className="reference-entry-copy"><p className="reference-entry-date">{entry.date}</p><h3>{entry.title}</h3><p className="reference-entry-body">{entry.body}</p></div>
               <button className="reference-entry-menu" aria-label={`查看演示记录：${entry.title}`} aria-expanded={menu === entry.id} onClick={()=>setMenu(menu === entry.id ? null : entry.id)}><MoreHorizontal size={22}/></button>
               {menu === entry.id && <div className="reference-menu" role="status">演示记录，不会保存到账号。<Link href="/journal">写下自己的记录 <ChevronRight size={13}/></Link></div>}
@@ -45,7 +46,7 @@ export function ReferenceOverview() {
         </section>
         <div className="reference-lower">
           <Link href="/review" className="reference-week"><h2>A week in moments</h2><ChevronRight className="reference-chevron" size={18} aria-hidden="true"/><div className="reference-week-days" aria-hidden="true">{["Mon","Tue","Wed","Thu","Fri","Sat","Sun"].map((day,i)=><span key={day}><i className={i === 1 || i === 4 ? "is-lilac" : ""}>{i === 0 || i > 4 ? <Sparkles size={8}/> : <b/>}</i><small>{day}</small></span>)}</div></Link>
-          <section className="reference-memory"><Link href="/memories" className="reference-memory-heading"><h2>Memory space</h2><ChevronRight size={18} aria-hidden="true"/></Link><p>Only what you choose to share.</p><div className="reference-notebook-missing" role="img" aria-label="半透明手帐本素材待提供"><span>手帐素材待提供</span></div><div className="reference-memory-control"><button type="button" role="switch" aria-checked={privateDemo} aria-label="演示隐私开关，不更改实际授权" onClick={()=>{setPrivateDemo(!privateDemo);setNotice("这是演示开关，没有更改任何记录授权。");}}><i/></button><span>{privateDemo ? "Private by default" : "Demo state only"}<small>You’re in control.</small></span></div></section>
+          <section className="reference-memory"><Link href="/memories" className="reference-memory-heading"><h2>Memory space</h2><ChevronRight size={18} aria-hidden="true"/></Link><p>Only what you choose to share.</p><div className="reference-notebook-missing" role="img" aria-label="珍珠玻璃手帐本"><ReferenceAsset kind="notebook"/></div><div className="reference-memory-control"><button type="button" role="switch" aria-checked={privateDemo} aria-label="演示隐私开关，不更改实际授权" onClick={()=>{setPrivateDemo(!privateDemo);setNotice("这是演示开关，没有更改任何记录授权。");}}><i/></button><span>{privateDemo ? "Private by default" : "Demo state only"}<small>You’re in control.</small></span></div></section>
         </div>
       </div>
       <aside className="reference-chat" aria-label="小栖演示面板">
@@ -53,12 +54,12 @@ export function ReferenceOverview() {
         <div className="reference-chat-front" aria-hidden="true"/>
         <div className="reference-chat-heading"><h2>Xiaoqi / 小栖</h2><p><i/>Here with you</p></div>
         <button className="reference-chat-menu" aria-label="演示对话说明" onClick={()=>setNotice("演示对话不会调用 AI 或保存。真实对话请打开 /chat。")}><MoreHorizontal size={22}/></button>
-        <div className="reference-cat-missing" role="img" aria-label="参考图小猫的透明背景素材待提供"><span>小栖透明素材待提供</span></div>
+        <div className="reference-cat-missing reference-cat-asset" role="img" aria-label="小栖，珍珠白半透明小猫"><ReferenceAsset kind="cat"/></div>
         <p className="reference-ai-bubble">What would you like to<br/>remember today?</p>
         <p className="reference-user-bubble">{message}</p><time className="reference-message-time">5:48 PM</time>
         <form className="reference-composer" onSubmit={send}><input aria-label="演示消息，不会调用 AI" value={text} onChange={e=>setText(e.target.value)} maxLength={2000} placeholder="Leave a little thought…"/><button type="submit" aria-label="发送演示消息"><ArrowRight size={25}/></button></form>
       </aside>
     </div>
-    <div className="reference-disclosure"><span>演示数据 · 不保存、不调用 AI · 图片占位待原始素材</span><Link href="/">返回真实首页</Link><p role="status">{notice}</p></div>
+    <div className="reference-disclosure"><span>演示数据 · 不保存、不调用 AI</span><Link href="/">返回真实首页</Link><p role="status">{notice}</p></div>
   </>;
 }

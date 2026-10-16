@@ -62,3 +62,7 @@ Second comparison at 1536 × 1024, scale 1: navigation, search, moments, lower c
 Actual Edge screenshots retained locally in visual-comparison/reference-fidelity. Desktop reference-demo and default real empty state captured, plus mobile 390/320. No horizontal overflow or page errors. Tested demo filters, list/grid switch, local privacy switch and message input; zero POST requests. Default homepage retains auth-backed components/empty states; journal navigation and removal of homepage-only CSS on the journal route verified.
 
 ESLint and TypeScript passed. Existing core suite: 21 passed. No live authenticated account or real AI call was exercised. No production database operation or migration performed. Missing assets are explicitly labeled and no unrelated substitute imagery is included.
+
+## Supplied asset integration
+
+The owner subsequently supplied two RGBA PNGs: a standalone pearl-white open-eye cat and a sheet with cat views, notebook and sea/desk images. Both have valid alpha (0–254); the apparent black background is transparent. Sources are copied verbatim into public/brand/xiaoqi-reference.png and reference-sheet.png. ReferenceAsset uses clipped SVG viewports to render their original pixel regions; no generative edits, recoloring or substitute imagery. Cat and notebook also appear on the real homepage; photographs remain exclusive to explicitly labeled demo records. Original landscape avatar is still not supplied. Exact typeface/material parity remains approximate.
