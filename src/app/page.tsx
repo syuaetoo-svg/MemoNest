@@ -1,30 +1,42 @@
 import Link from "next/link";
-import { ArrowUpRight, BookOpen, MessageCircle, ShieldCheck, PawPrint, LockKeyhole, Sparkles } from "lucide-react";
-import { GlassCompanion } from "@/components/glass-companion";
-export default function HomePage() {
-  return <div className="home-universe">
-    <section className="hero">
-      <div className="hero-copy"><p className="eyebrow">MEMONEST / YOUR LITTLE UNIVERSE</p>
-        <h1>把小小的日常，<br/><span>藏进温柔的宇宙。</span></h1>
-        <p className="hero-serif">Some moments deserve to stay.</p>
-        <p className="hero-description">一段随意的倾诉，一个舍不得忘的瞬间。<br/>和小栖一起，让生活慢慢有迹可循。</p>
-        <div className="hero-actions"><Link href="/chat" className="primary-link"><PawPrint size={16} aria-hidden="true"/>和小栖聊聊</Link><Link href="/journal" className="hero-secondary"><BookOpen size={16} aria-hidden="true"/>直接记录一个片刻</Link></div>
-        <p className="hero-footnote"><LockKeyhole aria-hidden="true"/> 私人记录，始终由你掌握</p>
+import Image from "next/image";
+import { ArrowRight, ArrowUpRight, BookOpen, ChevronRight, History, Infinity as InfinityIcon, LockKeyhole, Plus, Search, Sparkles, UserRound } from "lucide-react";
+import { JournalTimeline } from "@/components/core/journal";
+import { ChatWorkspace } from "@/components/core/ai";
+import { SessionBoundary } from "@/components/core/session-boundary";
+import { accountState } from "@/lib/server/supabase";
+import { aiConfigured } from "@/lib/server/ai-provider";
+import "./overview.css";
+export const dynamic = "force-dynamic";
+export default async function HomePage() {
+  const state = await accountState();
+  const authenticated = state.kind === "authenticated";
+  const content = <>
+    <div className="overview-columns">
+      <div className="overview-life">
+        <div className="overview-intro"><div><p className="overview-kicker">YOUR EVERYDAY, KEPT CLOSE</p><h1>A little space for your everyday.</h1></div><Link href="/journal" className="overview-new"><Plus size={17} aria-hidden="true"/>New entry</Link></div>
+        <section className="overview-moments overview-glass" aria-labelledby="moments-title">
+          <div className="overview-section-heading"><h2 id="moments-title">Your moments</h2><BookOpen size={20} aria-hidden="true"/></div>
+          {authenticated ? <JournalTimeline/> : <>
+            <div className="overview-tabs"><span>All entries</span><span><LockKeyhole size={13} aria-hidden="true"/>Private by default</span></div>
+            <div className="overview-empty"><span className="overview-empty-mark"><BookOpen size={30} strokeWidth={1.2} aria-hidden="true"/></span><h3>给日常，留一点位置</h3><p>{state.kind === "unavailable" ? "暂时无法验证会话，请稍后重试。没有读取你的私人内容。" : state.kind === "unconfigured" ? "记录服务尚未连接。连接后登录，即可在这里查看自己的生活片段。" : "登录后，你保存的生活片段会出现在这里。\n一个小小的瞬间，就值得被留下。"}</p><Link className="overview-text-link" href={state.kind === "anonymous" ? "/account?returnTo=%2Fjournal" : "/journal"}>{state.kind === "anonymous" ? "Sign in to your space" : "Open journal"}<ArrowUpRight size={16} aria-hidden="true"/></Link></div>
+          </>}
+        </section>
+        <div className="overview-bottom">
+          <Link href="/review" className="overview-glass overview-summary"><div className="overview-section-heading"><h2>A week in moments</h2><ChevronRight size={18} aria-hidden="true"/></div><p>回望那些，慢慢积累的小小日常。</p><div className="overview-week" aria-hidden="true">{["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map(day=><span key={day}><i/><small>{day}</small></span>)}</div><span className="overview-card-action"><History size={14} aria-hidden="true"/>Explore reflections</span></Link>
+          <Link href="/memories" className="overview-glass overview-memory"><div className="overview-section-heading"><h2>Memory space</h2><ChevronRight size={18} aria-hidden="true"/></div><p>Only what you choose to share.</p><div className="overview-notebook" aria-hidden="true"><span>MemoNest</span></div><span className="overview-memory-note"><LockKeyhole size={17} aria-hidden="true"/><span>默认私人保存<small>逐条授权，随时撤回。</small></span></span><span className="overview-card-action"><Sparkles size={14} aria-hidden="true"/>Manage memories</span></Link>
+        </div>
       </div>
-      <div className="hero-art">
-
-        <div className="cat-stage"><GlassCompanion state="welcome"/></div>
-        <div className="cat-greeting">嗨，我是小栖。<span>今天，想留下什么？</span></div>
-        <p className="hero-art-label">小栖 <span> XIAOQI / 安静陪你记录</span></p>
-
-      </div>
-    </section>
-    <section className="moment-path" aria-labelledby="journey-title">
-      <div className="path-intro"><p className="eyebrow">MAKE ROOM FOR LIFE</p><h2 id="journey-title">生活的碎片，<br/>都有一个落点。</h2><p>从此刻开始，就很好。</p></div>
-      <Link href="/chat" className="path-link"><span className="path-number">01 / CONNECT</span><MessageCircle size={24}/><h3>说给小栖听</h3><p>不必想好开场白，<br/>一点心事也值得被倾听。</p><ArrowUpRight className="path-arrow" size={19}/></Link>
-      <Link href="/journal" className="path-link"><span className="path-number">02 / KEEP</span><BookOpen size={24}/><h3>留住一个瞬间</h3><p>写下日常的小小波澜，<br/>保存属于自己的生活记录。</p><ArrowUpRight className="path-arrow" size={19}/></Link>
-      <Link href="/memories" className="path-link"><span className="path-number">03 / REMEMBER</span><Sparkles size={24} aria-hidden="true"/><h3>照看你的记忆</h3><p>回望生活的片段，<br/>决定哪些可以让小栖记住。</p><ArrowUpRight className="path-arrow" size={19} aria-hidden="true"/></Link>
-    </section>
-    <div className="privacy-ribbon"><ShieldCheck size={18}/><p>你的故事，由你决定。<span> 私人保存与长期记忆授权分别确认，随时可以撤回授权。</span></p><Link href="/privacy">了解隐私边界 <ArrowUpRight size={13}/></Link></div>
+      <aside className="overview-chat" aria-labelledby="xiaoqi-title">
+        <div className="overview-chat-heading"><div><h2 id="xiaoqi-title">Xiaoqi / 小栖</h2><p><span/>Here with you</p></div><Link href="/chat" aria-label="打开与小栖的完整对话" className="overview-chat-open"><ArrowUpRight size={19}/></Link></div>
+        <div className="overview-cat" aria-hidden="true"><span className="glass-companion"><span className="cat-life"><Image src="/brand/xiaoqi-warm.webp" alt="" width={768} height={768} sizes="(max-width: 500px) 210px, 218px" loading="eager" className="xiaoqi-render"/></span></span></div>
+        {authenticated ? <div className="overview-live-chat"><details className="overview-chat-boundary"><summary>关于对话与记忆</summary><p>当前页临时对话，离开或刷新会清除。发送时使用最近 5 条用户表达和相关有效授权摘要；历史 AI 回复不会再次发送。私人保存与长期记忆授权分别确认。</p></details><ChatWorkspace configured={aiConfigured()}/></div> : <div className="overview-chat-welcome"><p className="overview-bubble">今天，有什么想慢慢说给我听？</p><p className="overview-chat-note">一点心事，一件小事。<br/>从你愿意分享的地方开始。</p><Link href="/chat" className="overview-composer"><span>Leave a little thought…</span><span><ArrowRight size={22} aria-hidden="true"/></span></Link><p className="overview-login-note">登录并确认当次 AI 处理后，即可与小栖聊天。</p></div>}
+      </aside>
+    </div>
+    <footer className="overview-footer"><p><LockKeyhole size={13} aria-hidden="true"/>你的记录，由你决定。</p><Link href="/privacy">Privacy & permissions<ArrowUpRight size={13} aria-hidden="true"/></Link></footer>
+  </>;
+  return <div className="overview-page">
+    <header className="overview-header"><Link href="/" className="overview-brand" aria-label="MemoNest 首页"><InfinityIcon size={42} strokeWidth={1.3} aria-hidden="true"/>MemoNest</Link><nav aria-label="主导航">{[["/", "Overview"], ["/journal", "Journal"], ["/memories", "Memories"], ["/review", "Reflections"]].map(([href,label])=><Link key={href} href={href} aria-current={href === "/" ? "page" : undefined}>{label}</Link>)}</nav><div className="overview-account"><Link href="/memories" className="overview-search" aria-label="打开记录搜索"><Search size={19} aria-hidden="true"/><span>Find your moments</span></Link><Link href="/account" className="overview-avatar" aria-label="账号与登录"><UserRound size={21} aria-hidden="true"/></Link></div></header>
+    {authenticated ? <SessionBoundary key={state.userId} userId={state.userId}>{content}</SessionBoundary> : content}
   </div>;
 }
