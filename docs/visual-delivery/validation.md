@@ -1,3 +1,5 @@
+> 本文及同目录截图对应 2026-10-16 轻盈玻璃调整之前的版本，不作为新版视觉验收依据。新版状态见 [airy-glass-refinement.md](../airy-glass-refinement.md)。
+
 # Warm Liquid Glass delivery — 2026-10-15
 
 - Existing branch: design/liquid-glass-20261015; existing PR #15; do not merge without owner confirmation.

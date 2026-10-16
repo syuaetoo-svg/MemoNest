@@ -1,3 +1,5 @@
+> 2026-10-16 视觉方向已按用户参考调整为轻盈的雾白／浅灰绿玻璃，详见 [airy-glass-refinement.md](airy-glass-refinement.md)。下文暖色方案为前一版设计记录。
+
 # MemoNest / Warm Liquid Glass — full-site delivery
 
 Scope: continue the existing visual-redesign checkout. This warm system supersedes the earlier ice-blue system. Homepage, chat, journal writing, timeline, memory management, period review, detail, account and privacy layouts have now been redesigned. Existing record editor controls receive icons because the editor also appears inside the chat draft flow. No API, database, authentication or business-state changes.

@@ -5,6 +5,7 @@ import { Navigation } from "@/components/navigation";
 import { GlassCompanion } from "@/components/glass-companion";
 import "./globals.css";
 import "./fonts.css";
+import "./airy-glass.css";
 
 export const metadata: Metadata = {
   title: { default: "MemoNest · 记忆小屋", template: "%s · MemoNest" },

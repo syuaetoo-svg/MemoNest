@@ -11,12 +11,12 @@ export default function HomePage() {
         <div className="hero-actions"><Link href="/chat" className="primary-link"><PawPrint size={16} aria-hidden="true"/>和小栖聊聊</Link><Link href="/journal" className="hero-secondary"><BookOpen size={16} aria-hidden="true"/>直接记录一个片刻</Link></div>
         <p className="hero-footnote"><LockKeyhole aria-hidden="true"/> 私人记录，始终由你掌握</p>
       </div>
-      <div className="hero-art"><div className="universe-ring universe-ring--one"/><div className="universe-ring universe-ring--two"/>
-        <span className="orbit-word">A LITTLE COMPANY, A LITTLE MAGIC.</span>
+      <div className="hero-art">
+
         <div className="cat-stage"><GlassCompanion state="welcome"/></div>
         <div className="cat-greeting">嗨，我是小栖。<span>今天，想留下什么？</span></div>
-        <p className="hero-art-label">小栖 <span> XIAOQI / 你的液态小伙伴</span></p>
-        <span className="glass-droplet droplet-one"/><span className="glass-droplet droplet-two"/>
+        <p className="hero-art-label">小栖 <span> XIAOQI / 安静陪你记录</span></p>
+
       </div>
     </section>
     <section className="moment-path" aria-labelledby="journey-title">
