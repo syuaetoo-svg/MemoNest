@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { UserRound } from "lucide-react";
+import { Infinity, UserRound } from "lucide-react";
 import { Navigation } from "@/components/navigation";
-import { GlassCompanion } from "@/components/glass-companion";
 import "./globals.css";
 import "./fonts.css";
 import "./reference-theme.css";
@@ -15,7 +14,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   return <html lang="zh-CN"><body>
     <a href="#main-content" className="skip-link">跳到主要内容</a>
     <header className="site-header"><div className="header-inner">
-      <Link href="/" className="brand" aria-label="MemoNest 记忆小屋首页"><GlassCompanion size="mark" /><span><span className="brand-name">MemoNest</span><span className="brand-note">给生活一个温柔的落点</span></span></Link>
+      <Link href="/" className="brand" aria-label="MemoNest 记忆小屋首页"><Infinity size={46} strokeWidth={1.4} aria-hidden="true"/><span className="brand-name">MemoNest</span></Link>
       <div className="header-actions"><Navigation /><Link href="/account" className="account-link"><UserRound size={15} aria-hidden="true" />账号 / 登录</Link></div>
     </div></header>
     <main id="main-content" className="site-main">{children}</main>

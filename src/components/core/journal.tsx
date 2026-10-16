@@ -17,6 +17,7 @@ import {
   type EntryDraft,
 } from "@/lib/core/contracts";
 import { Card, EmptyState } from "@/components/ui";
+import { JournalCover } from "@/components/journal-cover";
 import { Button, Dialog, Feedback, fieldClass } from "./ui";
 import { MemoryPermission } from "./memories";
 import { JournalReview } from "./journal-review";
@@ -446,7 +447,7 @@ export function JournalTimeline({ initialQuery = "", presentation = "default" }:
             href={`/journal/${entry.id}`}
             className="timeline-fragment glass-feature block p-5"
           >
-            {overview && <span className="overview-note-cover" aria-hidden="true"><BookOpen size={32} strokeWidth={1.2}/><small>Private note</small></span>}
+            {overview && <JournalCover/>}
             <div className={overview ? "overview-entry-copy" : undefined}>
             <p className="fragment-date text-sm text-muted"><CalendarDays size={14} aria-hidden="true"/>{entry.event_date} · 私人记录</p>
             <h3 className="my-2 break-words font-semibold">

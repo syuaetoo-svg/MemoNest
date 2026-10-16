@@ -79,3 +79,15 @@ h1,h2,h3{font-family:var(--font-body);font-weight:500}
 @media(prefers-reduced-motion:reduce){.glass-companion .cat-life,.character-ripple{animation:none!important}}
 @media(prefers-contrast:more){.glass-panel,.glass-feature,.glass-dialog{background:#fff;border-color:#b6a7c3}.text-muted{color:#65586e}}
 @supports not (backdrop-filter:blur(1px)){.glass-panel,.glass-feature,.glass-dialog{background:#fdfbff}.companion-profile,.account-welcome{background:#f1ebf7}}
+/* Remove legacy warm surfaces, including higher-specificity and inactive states. */
+.brand>svg{flex-shrink:0;color:#292930}
+.timeline-fragment:nth-child(even){background:#ffffff80}
+.timeline-story::before{background:linear-gradient(#c5b2d8,#ded4e855)}
+.timeline-fragment::before{background:#c5b2d8;border-color:#fdfbff;box-shadow:0 0 0 5px #ece5f339}
+.memory-switch{background:#eeebf3b3}
+.memory-vault,.memory-authorization{color:#51475d}
+.memory-vault>.text-muted,.memory-vault .empty-state .text-muted{color:#7e7589}
+.memory-authorization--invalidated{background:#f3f0f5b3;border-left-color:#cfc9d7;color:#81758b}
+.character-ripple{border-color:#d9c9e5}
+@media(prefers-contrast:more){.journal-canvas,.timeline-fragment,.permission-surface,.review-story,.review-plan,.privacy-reading,.memory-vault,.memory-authorization,.inspiration-float{background:#fff;color:#292930}}
+@supports not (backdrop-filter:blur(1px)){.timeline-fragment,.inspiration-float,.memory-vault{background:#f5f1f8}}

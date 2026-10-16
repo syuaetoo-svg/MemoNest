@@ -36,3 +36,15 @@
 .reference-notebook-missing{right:22px;top:24px;width:145px;height:160px}
 .overview-notebook-reference{position:absolute;right:27px;top:22px;width:140px;height:160px;pointer-events:none}.overview-notebook-reference svg{width:100%;height:100%}
 @media(max-width:1200px){.overview-notebook-reference{right:10px;top:35px;width:100px;height:130px}}
+/* Keep the acceptance page subject to the same spacing/material corrections. */
+.reference-moments,.reference-week,.reference-memory{background:linear-gradient(125deg,#ffffffc7,#ffffffa3);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);box-shadow:0 12px 36px -24px #89819724}
+.reference-week-days i,.reference-week-days .is-lilac{background:linear-gradient(145deg,#faf7fd,#e8dcf1);border-color:#fff9;box-shadow:inset 0 1px 1px #fff}
+.reference-week-days>span:nth-child(2) i{background:linear-gradient(145deg,#f5effb,#e1ceef)}
+.reference-week-days>span:nth-child(5) i{background:linear-gradient(145deg,#f5eafd,#d9bdeb)}
+.reference-memory{--memory-art:116px;padding-right:calc(var(--memory-art) + 32px)}
+.reference-memory-heading>svg{position:absolute;right:27px;top:30px}
+.reference-notebook-missing{right:9px;top:27px;width:var(--memory-art);height:144px}
+.reference-memory-control{right:calc(var(--memory-art) + 16px);gap:9px;font-size:12px}
+.reference-memory-control small{font-size:11px}
+@media(min-width:851px) and (max-width:1200px){.reference-lower{grid-template-columns:1fr}}
+@media(max-width:500px){.reference-memory{--memory-art:92px}.reference-notebook-missing{right:5px;top:40px;height:120px}.reference-memory>p{font-size:12px}.reference-memory-control{font-size:10px;gap:7px}.reference-memory-control small{font-size:10px}}
