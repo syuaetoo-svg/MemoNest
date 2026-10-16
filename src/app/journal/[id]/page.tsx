@@ -7,7 +7,7 @@ import { uuid } from "@/lib/core/contracts";
 import { notFound } from "next/navigation";
 export const dynamic = "force-dynamic";
 export const metadata = {
-  title: "记录详情",
+  title: "Entry",
   robots: { index: false, follow: false },
 };
 export default async function JournalDetailPage({
@@ -22,8 +22,8 @@ export default async function JournalDetailPage({
     <>
       <PageHeading
         eyebrow="A MOMENT, YOURS TO KEEP"
-        title="照看这个片刻"
-        description="原记录留给自己；让角色使用的摘要需要另一次明确授权。"
+        title="Your entry"
+        description="This entry is private. Sharing a summary with Xiaoqi needs separate permission."
       />
       {state.kind === "authenticated" ? (
         <SessionBoundary key={`${state.userId}:${id}`} userId={state.userId}>

@@ -1,7 +1,49 @@
 import Link from "next/link";
-import { ArrowRight, BookOpen, Heart, MessageCircle, ShieldCheck, Sprout } from "lucide-react";
-import { FeatureLink } from "@/components/ui";
-
-export default function HomePage() {
-  return <div className="space-y-9"><section className="relative overflow-hidden rounded-[2rem] border border-line bg-surface p-7 sm:p-12"><div className="grid items-center gap-10 md:grid-cols-[1.3fr_1fr]"><div><p className="eyebrow mb-5">WELCOME TO YOUR LITTLE NEST</p><h1 className="text-4xl font-semibold leading-snug tracking-tight sm:text-5xl">每一个平凡日子，<br /><span className="text-sage-dark">都值得被记得。</span></h1><p className="mt-6 max-w-lg leading-8 text-muted">在记忆小屋，和温柔的伙伴聊聊生活。你可以先写下重要的片刻，保存给自己，再决定是否让角色记住。</p><div className="mt-8 flex flex-wrap items-center gap-4"><Link href="/chat" className="primary-link">认识你的伙伴 <ArrowRight size={16} aria-hidden="true" /></Link><Link href="/journal" className="inline-flex min-h-11 items-center text-sm text-sage-dark underline">直接记录一个片刻</Link></div></div><div className="flex min-h-64 items-center justify-center rounded-[2rem] bg-sage-light p-8"><div className="flex h-52 w-52 flex-col items-center justify-center rounded-[45%] border border-white bg-surface/70 text-sage-dark"><Sprout size={66} strokeWidth={1.2} aria-hidden="true" /><p className="mt-5 text-sm tracking-widest">让记忆慢慢生长</p><span className="mt-2 text-xs text-muted">a little space for your life</span></div></div></div></section><section aria-labelledby="journey-title"><div className="mb-5 flex items-center justify-between"><h2 id="journey-title" className="text-xl font-semibold">从一个小小的片刻开始</h2><span className="text-xs text-muted">陪伴 · 记录 · 回望</span></div><div className="grid gap-4 md:grid-cols-3"><FeatureLink href="/chat" title="和小栖聊一聊" description="和原创 AI 伙伴聊聊，再选择原话整理成记录。"><MessageCircle size={24} aria-hidden="true" /></FeatureLink><FeatureLink href="/journal" title="写下今天的生活" description="为日常经历留一个位置，登录后保存属于自己的私人记录。"><BookOpen size={24} aria-hidden="true" /></FeatureLink><FeatureLink href="/memories" title="照看你的记忆" description="回看私人时间线，管理角色的逐条授权。"><Heart size={24} aria-hidden="true" /></FeatureLink></div></section><div className="flex items-start gap-4 rounded-2xl bg-clay-light p-5"><ShieldCheck size={22} className="mt-1 shrink-0 text-clay" aria-hidden="true" /><div><h2 className="text-sm font-semibold">你的故事，由你决定是否留下</h2><p className="mt-1 text-sm leading-7 text-muted">私人记录默认不供角色使用。长期记忆需要单独授权；AI 处理前会说明范围并征得同意，保存与长期授权分开确认。</p></div></div></div>;
+import { ArrowRight, ArrowUpRight, BookOpen, ChevronRight, History, Infinity as InfinityIcon, LockKeyhole, Plus, Search, Sparkles, UserRound } from "lucide-react";
+import { JournalTimeline } from "@/components/core/journal";
+import { ChatWorkspace } from "@/components/core/ai";
+import { SessionBoundary } from "@/components/core/session-boundary";
+import { accountState } from "@/lib/server/supabase";
+import { aiConfigured } from "@/lib/server/ai-provider";
+import { ReferenceOverview } from "@/components/reference-overview";
+import { Navigation } from "@/components/navigation";
+import { ReferenceAsset } from "@/components/reference-assets";
+import "./overview.css";
+export const dynamic = "force-dynamic";
+export default async function HomePage({ searchParams }: { searchParams: Promise<{ q?: string; demo?: string }> }) {
+  const params = await searchParams;
+  const referenceDemo = params.demo === "reference";
+  const query = typeof params.q === "string" ? params.q.slice(0, 200).trim() : "";
+  const today = new Intl.DateTimeFormat("en-US", { weekday: "long", month: "long", day: "numeric", timeZone: "Asia/Seoul" }).format(new Date()).toUpperCase();
+  const state = referenceDemo ? { kind: "anonymous" as const } : await accountState();
+  const authenticated = state.kind === "authenticated";
+  const content = <>
+    <div className="overview-columns">
+      <div className="overview-life">
+        <div className="overview-intro"><div><p className="overview-kicker">{today}</p><h1>A little space for your everyday.</h1></div><Link href="/journal" className="overview-new"><Plus size={17} aria-hidden="true"/>New entry</Link></div>
+        <section className="overview-moments overview-glass" aria-labelledby="moments-title">
+          <div className="overview-section-heading"><h2 id="moments-title">Your moments</h2>{!authenticated && <BookOpen size={20} aria-hidden="true"/>}</div>
+          {authenticated ? <JournalTimeline key={query} initialQuery={query} presentation="overview"/> : <>
+            <div className="overview-tabs"><span>All entries</span><span><LockKeyhole size={13} aria-hidden="true"/>Private by default</span></div>
+            <div className="overview-empty"><span className="overview-empty-mark"><BookOpen size={30} strokeWidth={1.2} aria-hidden="true"/></span><h3>A space for your everyday</h3><p>{state.kind === "unavailable" ? "We couldn’t check your session. Try again shortly. Your private entries have not been read." : state.kind === "unconfigured" ? "The journal service is not connected yet. Once connected, sign in to see your entries." : "Sign in to see your saved moments.\nA little moment is enough to begin."}</p><Link className="overview-text-link" href={state.kind === "anonymous" ? "/account?returnTo=%2Fjournal" : "/journal"}>{state.kind === "anonymous" ? "Sign in to your space" : "Open journal"}<ArrowUpRight size={16} aria-hidden="true"/></Link></div>
+          </>}
+        </section>
+        <div className="overview-bottom">
+          <Link href="/review" className="overview-glass overview-summary"><div className="overview-section-heading"><h2>A week in moments</h2><ChevronRight size={18} aria-hidden="true"/></div><p>A look at the little moments along the way.</p><div className="overview-week" aria-hidden="true">{["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map(day=><span key={day}><i/><small>{day}</small></span>)}</div><span className="overview-card-action"><History size={14} aria-hidden="true"/>Explore reflections</span></Link>
+          <Link href="/memories" className="overview-glass overview-memory"><div className="overview-section-heading"><h2>Memory space</h2><ChevronRight size={18} aria-hidden="true"/></div><p>Only what you choose to share.</p><span className="overview-notebook-reference" aria-hidden="true"><ReferenceAsset kind="notebook"/></span><span className="overview-memory-note"><LockKeyhole size={17} aria-hidden="true"/><span>Private by default<small>Share individually. Revoke anytime.</small></span></span><span className="overview-card-action"><Sparkles size={14} aria-hidden="true"/>Manage memories</span></Link>
+        </div>
+      </div>
+      <aside className="overview-chat" aria-labelledby="xiaoqi-title">
+        <span className="overview-folder-tab" aria-hidden="true"/>
+        <div className="overview-chat-heading"><div><h2 id="xiaoqi-title">Xiaoqi / 小栖</h2><p><span/>Here with you</p></div><Link href="/chat" aria-label="Open chat with Xiaoqi" className="overview-chat-open"><ArrowUpRight size={19}/></Link></div>
+        <div className="overview-cat overview-cat-reference" role="img" aria-label="Xiaoqi, a pearl-white translucent cat"><ReferenceAsset kind="cat"/></div>
+        {authenticated ? <div className="overview-live-chat"><details className="overview-chat-boundary"><summary>Chat & memory privacy</summary><p>Chat lasts only on this page and clears when you leave or refresh. Requests use your last five messages and relevant authorized summaries, not earlier AI replies. Saving and memory permission are separate.</p></details><ChatWorkspace configured={aiConfigured()} embedded/></div> : <div className="overview-chat-welcome"><p className="overview-bubble">What would you like to remember today?</p><p className="overview-chat-note">A thought, a little moment.<br/>Start wherever you feel comfortable.</p><Link href="/chat" className="overview-composer"><span>Leave a little thought…</span><span><ArrowRight size={22} aria-hidden="true"/></span></Link><p className="overview-login-note">Sign in and consent to AI processing to chat with Xiaoqi.</p></div>}
+      </aside>
+    </div>
+    <footer className="overview-footer"><p><LockKeyhole size={13} aria-hidden="true"/>Your moments. Your choice.</p><Link href="/privacy">Privacy & permissions<ArrowUpRight size={13} aria-hidden="true"/></Link></footer>
+  </>;
+  return <div className="overview-page" data-reference-demo={referenceDemo || undefined}>
+    <header className="overview-header"><Link href="/" className="overview-brand" aria-label="MemoNest home"><InfinityIcon size={48} strokeWidth={1.3} aria-hidden="true"/>MemoNest</Link><Navigation/><div className="overview-account"><form action="/" className="overview-search" role="search"><button type="submit" aria-label="Search entries"><Search size={20} aria-hidden="true"/></button><input name="q" defaultValue={query} maxLength={200} aria-label="Search entries" placeholder="Search your memories…"/></form><Link href="/account" className="overview-avatar" aria-label="Account & sign in"><UserRound size={21} aria-hidden="true"/></Link></div></header>
+    {referenceDemo ? <ReferenceOverview/> : authenticated ? <SessionBoundary key={state.userId} userId={state.userId}>{content}</SessionBoundary> : content}
+  </div>;
 }

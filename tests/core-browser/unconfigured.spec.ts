@@ -5,10 +5,10 @@ test("missing services show honest guidance and preserve formal routes/UX lab", 
   for (const path of ["/account", "/journal", "/memories", "/chat", "/review"]) {
     await page.goto(path);
     await expect(
-      page.getByRole("heading", { name: "连接你的小屋之前" }),
+      page.getByRole("heading", { name: "Service not connected" }),
     ).toBeVisible();
     await expect(
-      page.getByText("真实认证与数据库尚未配置。", { exact: false }),
+      page.getByText("Authentication and storage are not configured.", { exact: false }),
     ).toBeVisible();
     expect(await page.locator("input[type=password]").count()).toBe(0);
     expect(
@@ -18,12 +18,12 @@ test("missing services show honest guidance and preserve formal routes/UX lab", 
     ).toBe(true);
   }
   await page.goto("/privacy");
-  await expect(page.getByRole("heading", { name: "记录与记忆，由你决定" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Your journal, your choice" })).toBeVisible();
   await page.goto("/ux-lab");
   await expect(page.getByRole("link", { name: /传统手动记录/ })).toBeVisible();
   await page.goto("/");
   await expect(
-    page.getByRole("link", { name: "直接记录一个片刻" }),
+    page.getByRole("link", { name: "New entry" }),
   ).toBeVisible();
 });
 test("unconfigured API never pretends persistence/auth; cross-origin writes rejected", async ({

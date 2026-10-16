@@ -3,6 +3,7 @@ import { credentialsInput, confirmInput } from "@/lib/core/contracts";
 import { serverClient } from "./supabase";
 import { appOrigin } from "./config";
 import { authenticated, body, json, route, ApiError } from "./http";
+import { registrationOutcome, signupFailure, confirmSession } from "./auth-outcomes";
 async function authClient() {
   const client = await serverClient();
   if (!client)
@@ -20,18 +21,13 @@ export const signup = route(async (request) => {
     ...input,
     options: { emailRedirectTo: `${appOrigin(request.url)}/auth/confirm` },
   });
-  if (error)
-    throw new ApiError(
-      error.status === 429 ? 429 : 400,
-      "SIGNUP_FAILED",
-      "注册尚未完成，请检查邮箱与密码或稍后重试；密码须符合服务端策略",
-    );
-  return json({
-    authenticated: !!data.session,
-    message: data.session
-      ? "注册成功，已登录"
-      : "请查看邮箱完成确认；如果邮箱已有账号，请直接登录",
-  });
+  if (error) {
+    const failure = signupFailure(error);
+    // Only application-owned categories; never email, password, raw response or token.
+    console.warn("[auth] signup rejected", { status: failure.status, code: failure.code });
+    throw failure;
+  }
+  return json(registrationOutcome(!!data.session));
 });
 export const login = route(async (request) => {
   const client = await authClient();
@@ -54,17 +50,7 @@ export const logout = route(async (request) => {
 export const confirm = route(async (request) => {
   const client = await authClient();
   const input = await body(request, confirmInput);
-  const { error } = await client.auth.verifyOtp({
-    token_hash: input.tokenHash,
-    type: "email",
-  });
-  if (error)
-    throw new ApiError(
-      400,
-      "CONFIRM_FAILED",
-      "确认链接无效或已过期，请重新注册或登录",
-    );
-  return json({ authenticated: true });
+  return json(await confirmSession(client.auth, input));
 });
 
 export const session = route(async () => {

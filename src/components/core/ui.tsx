@@ -6,8 +6,10 @@ import {
   type ButtonHTMLAttributes,
   type ReactNode,
 } from "react";
+import { GlassButton } from "@/components/glass";
+import { interfaceFeedback } from "@/lib/core/interface-copy";
 export const fieldClass =
-  "w-full min-w-0 rounded-xl border border-[#7b877d] bg-surface px-3 py-3 text-base";
+  "glass-field w-full min-w-0 px-4 py-3 text-base";
 export function Button({
   children,
   className = "",
@@ -16,19 +18,14 @@ export function Button({
 }: ButtonHTMLAttributes<HTMLButtonElement> & {
   tone?: "primary" | "secondary" | "danger";
 }) {
-  const colors =
-    tone === "primary"
-      ? "bg-sage-dark text-white"
-      : tone === "danger"
-        ? "border border-[#8a3030] text-[#8a3030] bg-surface"
-        : "border border-[#7b877d] bg-surface text-ink";
   return (
-    <button
+    <GlassButton
       {...props}
-      className={`min-h-11 rounded-xl px-4 py-3 text-sm font-medium disabled:cursor-not-allowed disabled:opacity-60 ${colors} ${className}`}
+      tone={tone}
+      className={className}
     >
       {children}
-    </button>
+    </GlassButton>
   );
 }
 export function Feedback({
@@ -43,7 +40,7 @@ export function Feedback({
       role={error ? "alert" : "status"}
       className={`rounded-xl p-4 text-sm leading-6 ${error ? "bg-[#fbecec] text-[#8a3030]" : "bg-sage-light text-sage-dark"}`}
     >
-      {message}
+      {interfaceFeedback(message)}
     </p>
   ) : null;
 }
@@ -72,7 +69,7 @@ export function Dialog({
         event.preventDefault();
         onClose();
       }}
-      className="m-auto max-h-[85dvh] w-[calc(100%-2rem)] max-w-lg overflow-y-auto rounded-3xl border border-line bg-surface p-6 text-ink backdrop:bg-ink/30"
+      className="glass-dialog m-auto max-h-[85dvh] w-[calc(100%-2rem)] max-w-lg overflow-y-auto p-6 text-ink"
     >
       <h2 id={id} className="mb-5 text-xl font-semibold">
         {title}

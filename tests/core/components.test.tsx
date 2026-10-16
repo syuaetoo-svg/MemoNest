@@ -44,6 +44,7 @@ test("core component recovery and separate permission controls", async (t) => {
     await import("../../src/components/core/session-boundary");
   const { IdentityContext } = await import("../../src/lib/core/client");
   const { JournalReview } = await import("../../src/components/core/journal-review");
+  const { ConfirmEmail } = await import("../../src/components/core/account");
   const userId = randomUUID(),
     id = randomUUID();
   const entry = {
@@ -57,6 +58,36 @@ test("core component recovery and separate permission controls", async (t) => {
     updated_at: "2026-01-01T00:00:00Z",
   };
   try {
+    await t.test("PKCE confirmation waits for an explicit click and does not claim success on failure", async () => {
+      let calls = 0;
+      globalThis.fetch = async (url, options) => {
+        calls++;
+        assert.equal(url, "/api/auth/confirm");
+        assert.equal(options?.method, "POST");
+        assert.deepEqual(JSON.parse(options?.body as string), { code: "synthetic-pkce-code" });
+        return Response.json({ error: { code: "CONFIRM_FAILED", message: "synthetic confirmation failure" } }, { status: 400 });
+      };
+      const view = render(<ConfirmEmail tokenHash="" code="synthetic-pkce-code"/>);
+      assert.equal(calls, 0);
+      fireEvent.click(view.getByRole("button", { name: /^Confirm email$/ }));
+      await waitFor(()=>assert.ok(view.getByRole("alert")));
+      assert.equal(calls, 1);
+      assert.equal((view.getByRole("button", { name: /^Confirm email$/ }) as HTMLButtonElement).disabled, false);
+      cleanup();
+    });
+    await t.test("real overview presentation refreshes saved entries without changing source permissions", async () => {
+      let reads = 0;
+      globalThis.fetch = async () => Response.json({ entries: ++reads === 1 ? [] : [{ ...entry, title: "newly saved synthetic entry" }], nextCursor: null });
+      const view = render(<IdentityContext value={userId}><JournalTimeline presentation="overview"/></IdentityContext>);
+      await waitFor(()=>assert.ok(view.getByText("No saved moments yet")));
+      await act(async()=>{ window.dispatchEvent(new dom.window.Event("memonest:entries-changed")); });
+      await waitFor(()=>assert.ok(view.getByText("newly saved synthetic entry")));
+      assert.equal(reads, 2);
+      fireEvent.click(view.getByRole("button", { name: "Grid view" }));
+      assert.equal(view.getByRole("button", { name: "Grid view" }).getAttribute("aria-pressed"), "true");
+      assert.ok(view.getByText("Saved"));
+      cleanup();
+    });
     await t.test("AI review requires separate consent, reports failure and discards cancelled late output", async () => {
       let calls = 0;
       let complete!: (response: Response) => void;
@@ -72,15 +103,15 @@ test("core component recovery and separate permission controls", async (t) => {
       const view = render(<IdentityContext value={userId}><JournalReview entry={entry} /></IdentityContext>);
       const consent = view.getByRole("checkbox") as HTMLInputElement;
       assert.equal(consent.checked, false);
-      assert.equal((view.getByRole("button", { name: "生成本次回顾" }) as HTMLButtonElement).disabled, true);
+      assert.equal((view.getByRole("button", { name: "Create reflection" }) as HTMLButtonElement).disabled, true);
       assert.equal(calls, 0);
       fireEvent.click(consent);
-      fireEvent.click(view.getByRole("button", { name: "生成本次回顾" }));
-      await waitFor(() => assert.ok(view.getByText("AI 回顾尚未配置")));
+      fireEvent.click(view.getByRole("button", { name: "Create reflection" }));
+      await waitFor(() => assert.ok(view.getByText("AI is not connected yet. You can still write and save entries yourself.")));
       assert.equal(consent.checked, false);
       fireEvent.click(consent);
-      fireEvent.click(view.getByRole("button", { name: "生成本次回顾" }));
-      fireEvent.click(view.getByRole("button", { name: "停止回顾" }));
+      fireEvent.click(view.getByRole("button", { name: "Create reflection" }));
+      fireEvent.click(view.getByRole("button", { name: "Stop reflection" }));
       await act(async () => {
         complete(Response.json({ moments: [{ text: "late result must not appear", quote: entry.body }],
           source: { id: entry.id, version: 1, title: "", eventDate: entry.event_date } }));
@@ -109,12 +140,12 @@ test("core component recovery and separate permission controls", async (t) => {
           };
           const view = render(<IdentityContext value={userId}><JournalTimeline /></IdentityContext>);
           await waitFor(() => assert.ok(view.getByText("initial result")));
-          fireEvent.click(view.getByRole("button", { name: "加载更早的记录" }));
-          assert.ok(view.getByRole("button", { name: "正在加载…" }));
-          fireEvent.change(view.getByRole("textbox", { name: "原文关键词" }), { target: { value: "walk" } });
-          fireEvent.click(view.getByRole("button", { name: "查找" }));
+          fireEvent.click(view.getByRole("button", { name: "Load earlier entries" }));
+          assert.ok(view.getByRole("button", { name: "Loading…" }));
+          fireEvent.change(view.getByRole("textbox", { name: "Keywords" }), { target: { value: "walk" } });
+          fireEvent.click(view.getByRole("button", { name: "Search" }));
           await waitFor(() => assert.ok(view.getByText("walk result")));
-          assert.equal((view.getByRole("button", { name: "加载更早的记录" }) as HTMLButtonElement).disabled, false);
+          assert.equal((view.getByRole("button", { name: "Load earlier entries" }) as HTMLButtonElement).disabled, false);
           await act(async () => {
             complete(failure
               ? Response.json({ error: { code: "SERVICE_ERROR", message: "stale pagination error" } }, { status: 503 })
@@ -123,7 +154,7 @@ test("core component recovery and separate permission controls", async (t) => {
           });
           assert.equal(view.queryByText("stale pagination result"), null);
           assert.equal(view.queryByText("stale pagination error"), null);
-          assert.ok(view.getByRole("button", { name: "加载更早的记录" }));
+          assert.ok(view.getByRole("button", { name: "Load earlier entries" }));
           cleanup();
         },
       );
@@ -161,33 +192,33 @@ test("core component recovery and separate permission controls", async (t) => {
         );
         await waitFor(() =>
           assert.notEqual(
-            (view.getByLabelText("事情发生的日期") as HTMLInputElement).value,
+            (view.getByLabelText("Date of your moment") as HTMLInputElement).value,
             "",
           ),
         );
-        fireEvent.change(view.getByLabelText("今天发生了什么？（必填）"), {
+        fireEvent.change(view.getByLabelText("What happened? (required)"), {
           target: { value: "FICTIONAL_COMPONENT_DRAFT" },
         });
         fireEvent.submit(view.container.querySelector("form")!);
         fireEvent.click(
-          view.getByRole("button", { name: "确认保存为私人记录" }),
+          view.getByRole("button", { name: "Save privately" }),
         );
-        await waitFor(() => assert.ok(view.getByText("未确认保存，请重试")));
-        fireEvent.click(view.getByRole("button", { name: "返回编辑" }));
+        await waitFor(() => assert.ok(view.getByText("Connection lost. Keep this page open and try again; the action is not confirmed.")));
+        fireEvent.click(view.getByRole("button", { name: "Back to editing" }));
         assert.equal(
           (
             view.getByLabelText(
-              "今天发生了什么？（必填）",
+              "What happened? (required)",
             ) as HTMLTextAreaElement
           ).value,
           "FICTIONAL_COMPONENT_DRAFT",
         );
         fireEvent.submit(view.container.querySelector("form")!);
         fireEvent.click(
-          view.getByRole("button", { name: "确认保存为私人记录" }),
+          view.getByRole("button", { name: "Save privately" }),
         );
         await waitFor(() =>
-          assert.ok(view.getByText("已保存给你自己，尚未授权角色使用")),
+          assert.ok(view.getByText("Saved privately. Not shared with Xiaoqi.")),
         );
         assert.equal(requests.length, 2);
         assert.equal(requests[0].requestId, requests[1].requestId);
@@ -256,50 +287,50 @@ test("core component recovery and separate permission controls", async (t) => {
           assert.equal(
             (
               view.getByRole("button", {
-                name: "让小栖记住这条",
+                name: "Share a memory",
               }) as HTMLButtonElement
             ).disabled,
             false,
           ),
         );
         assert.equal(grantAttempts, 0);
-        fireEvent.click(view.getByRole("button", { name: "让小栖记住这条" }));
+        fireEvent.click(view.getByRole("button", { name: "Share a memory" }));
         assert.equal(
           (view.getByRole("checkbox") as HTMLInputElement).checked,
           false,
         );
         fireEvent.change(
-          view.getByLabelText("你允许使用的确切摘要（最多 1200 字）"),
+          view.getByLabelText("Exact summary to share (up to 1,200 characters)"),
           { target: { value: "exact authorized summary" } },
         );
-        fireEvent.click(view.getByRole("button", { name: "确认授权这条摘要" }));
+        fireEvent.click(view.getByRole("button", { name: "Share this summary" }));
         assert.equal(grantAttempts, 0);
-        assert.ok(view.getByText("请填写要授权的确切摘要，并主动勾选确认范围"));
+        assert.ok(view.getByText("Enter the exact summary and check the consent box before sharing."));
         fireEvent.click(view.getByRole("checkbox"));
-        fireEvent.click(view.getByRole("button", { name: "确认授权这条摘要" }));
-        await waitFor(() => assert.ok(view.getByText("授权未确认，请重试")));
+        fireEvent.click(view.getByRole("button", { name: "Share this summary" }));
+        await waitFor(() => assert.ok(view.getByText("Your journal is temporarily unavailable. Keep your draft and try again.")));
         assert.equal(
           (
             view.getByLabelText(
-              "你允许使用的确切摘要（最多 1200 字）",
+              "Exact summary to share (up to 1,200 characters)",
             ) as HTMLTextAreaElement
           ).value,
           "exact authorized summary",
         );
-        fireEvent.click(view.getByRole("button", { name: "确认授权这条摘要" }));
+        fireEvent.click(view.getByRole("button", { name: "Share this summary" }));
         await waitFor(() =>
-          assert.ok(view.getByText("已授权 · 仅限小栖 · 来源版本 1")),
+          assert.ok(view.getByText("Shared with Xiaoqi only · Source version 1")),
         );
         assert.equal(grantKeys[0], grantKeys[1]);
-        fireEvent.click(view.getByRole("button", { name: "撤回授权" }));
-        fireEvent.click(view.getByRole("button", { name: "取消" }));
+        fireEvent.click(view.getByRole("button", { name: "Revoke access" }));
+        fireEvent.click(view.getByRole("button", { name: "Cancel" }));
         assert.equal(revokeAttempts, 0);
-        fireEvent.click(view.getByRole("button", { name: "撤回授权" }));
-        fireEvent.click(view.getByRole("button", { name: "确认撤回授权" }));
+        fireEvent.click(view.getByRole("button", { name: "Revoke access" }));
+        fireEvent.click(view.getByRole("button", { name: "Confirm revoke" }));
         await waitFor(() =>
           assert.ok(
             view.getByText(
-              "授权已撤回，私人记录仍保留；后续上下文不再允许使用这条摘要",
+              "Permission withdrawn. Your entry is kept; this summary is excluded from future requests.",
             ),
           ),
         );
@@ -321,7 +352,7 @@ test("core component recovery and separate permission controls", async (t) => {
         );
         assert.ok(view.getByText("PRIVATE_COMPONENT_MARKER"));
         fireEvent.focus(window);
-        await waitFor(() => assert.ok(view.getByText("会话已变化")));
+        await waitFor(() => assert.ok(view.getByText("Your session has changed")));
         assert.equal(view.queryByText("PRIVATE_COMPONENT_MARKER"), null);
         assert.equal(view.container.querySelector("textarea"), null);
         cleanup();

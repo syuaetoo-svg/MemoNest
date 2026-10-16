@@ -1,10 +1,12 @@
 "use client";
+import { LogIn, UserPlus, PenLine, LogOut, Check, ArrowLeft } from "lucide-react";
 import { useState, type FormEvent } from "react";
 import Link from "next/link";
 import { api, messageOf } from "@/lib/core/client";
 import { credentialsInput } from "@/lib/core/contracts";
 import { Button, Feedback, fieldClass } from "./ui";
 import { Card } from "@/components/ui";
+import { confirmationPending } from "@/lib/core/interface-copy";
 // Full navigation after identity changes drops private client state and the router cache.
 export function AccountForm({ returnTo }: { returnTo: string }) {
   const [mode, setMode] = useState<"login" | "signup">("login"),
@@ -32,7 +34,7 @@ export function AccountForm({ returnTo }: { returnTo: string }) {
       setPassword("");
       if (result.authenticated)
         window.location.assign(new URL(returnTo, window.location.origin).href);
-      else setNotice(result.message || "请检查邮箱完成确认");
+      else setNotice(confirmationPending);
     } catch (e) {
       setError(messageOf(e));
     } finally {
@@ -40,7 +42,7 @@ export function AccountForm({ returnTo }: { returnTo: string }) {
     }
   }
   return (
-    <Card>
+    <Card className="account-surface">
       <div className="mb-6 flex gap-3">
         <Button
           tone={mode === "login" ? "primary" : "secondary"}
@@ -50,8 +52,8 @@ export function AccountForm({ returnTo }: { returnTo: string }) {
             setNotice("");
           }}
           disabled={busy}
-        >
-          登录
+        ><LogIn size={16} aria-hidden="true" className="control-icon"/>
+          Sign in
         </Button>
         <Button
           tone={mode === "signup" ? "primary" : "secondary"}
@@ -61,17 +63,17 @@ export function AccountForm({ returnTo }: { returnTo: string }) {
             setNotice("");
           }}
           disabled={busy}
-        >
-          注册
+        ><UserPlus size={16} aria-hidden="true" className="control-icon"/>
+          Create account
         </Button>
       </div>
       <h2 className="mb-5 text-xl font-semibold">
-        {mode === "login" ? "回到你的小屋" : "建立自己的记忆小屋"}
+        {mode === "login" ? "Welcome back" : "Create your space"}
       </h2>
       <form onSubmit={submit} className="space-y-5">
         <div>
           <label htmlFor="account-email" className="mb-2 block text-sm">
-            邮箱
+            Email
           </label>
           <input
             id="account-email"
@@ -87,7 +89,7 @@ export function AccountForm({ returnTo }: { returnTo: string }) {
         </div>
         <div>
           <label htmlFor="account-password" className="mb-2 block text-sm">
-            密码（至少 8 位）
+            Password (at least 8 characters)
           </label>
           <input
             id="account-password"
@@ -106,13 +108,13 @@ export function AccountForm({ returnTo }: { returnTo: string }) {
         </div>
         <Feedback message={error} error />
         <Feedback message={notice} />
-        <Button type="submit" disabled={busy}>
-          {busy ? "正在验证…" : mode === "login" ? "登录小屋" : "注册账号"}
+        <Button type="submit" disabled={busy}><UserPlus size={16} aria-hidden="true" className="control-icon"/>
+          {busy ? (mode === "login" ? "Signing in…" : "Creating account…") : mode === "login" ? "Sign in" : "Create account"}
         </Button>
       </form>
       <p className="mt-5 text-sm leading-7 text-muted">
-        使用 Supabase Auth
-        验证身份。注册可能需要邮箱确认；不创建示例账号、不自动授权 AI 使用记录。
+        We use Supabase Auth
+        to verify your identity. You may need to confirm your email. Creating an account does not grant AI access to your entries.
       </p>
     </Card>
   );
@@ -141,31 +143,31 @@ export function SignedInAccount({
   }
   return (
     <Card>
-      <h2 className="text-xl font-semibold">已登录</h2>
+      <h2 className="text-xl font-semibold">You’re signed in</h2>
       <p className="my-4 break-all text-sm text-muted">{email}</p>
       <Feedback message={error} error />
       <div className="mt-5 flex flex-wrap gap-3">
-        <Link className="primary-link" href={returnTo}>
-          继续记录
+        <Link className="primary-link" href={returnTo}><PenLine size={16} aria-hidden="true" className="control-icon"/>
+          Continue writing
         </Link>
-        <Button tone="secondary" disabled={busy} onClick={logout}>
-          {busy ? "正在退出…" : "退出所有会话"}
+        <Button tone="secondary" disabled={busy} onClick={logout}><LogOut size={16} aria-hidden="true" className="control-icon"/>
+          {busy ? "Signing out…" : "Sign out everywhere"}
         </Button>
       </div>
       <p className="mt-4 text-sm leading-7 text-muted">
-        退出会清除本浏览器会话并撤销账号的刷新会话。离开共享设备前请确认退出成功。
+        Signing out clears this browser’s session and revokes the account’s refresh sessions. On a shared device, check that sign-out completes.
       </p>
     </Card>
   );
 }
-export function ConfirmEmail({ tokenHash }: { tokenHash: string }) {
+export function ConfirmEmail({ tokenHash, code = "" }: { tokenHash: string; code?: string }) {
   const [busy, setBusy] = useState(false),
     [error, setError] = useState("");
   async function confirm() {
     setBusy(true);
     setError("");
     try {
-      await api("/api/auth/confirm", "POST", { tokenHash });
+      await api("/api/auth/confirm", "POST", tokenHash ? { tokenHash } : { code });
       window.location.replace(new URL("/journal", window.location.origin).href);
     } catch (e) {
       setError(messageOf(e));
@@ -174,19 +176,19 @@ export function ConfirmEmail({ tokenHash }: { tokenHash: string }) {
   }
   return (
     <Card>
-      <h2 className="text-xl font-semibold">确认邮箱，进入小屋</h2>
+      <h2 className="text-xl font-semibold">Confirm your email</h2>
       <p className="my-4 text-sm leading-7 text-muted">
-        只有你主动确认后才建立登录会话。确认链接只能使用一次。
+        Sign-in starts only after you confirm. The link can be used once.
       </p>
       <Feedback message={error} error />
-      <Button disabled={busy || !tokenHash} onClick={confirm}>
-        {busy ? "正在确认…" : "确认邮箱"}
+      <Button disabled={busy || (!tokenHash && !code)} onClick={confirm}><Check size={16} aria-hidden="true" className="control-icon"/>
+        {busy ? "Confirming…" : "Confirm email"}
       </Button>
-      <Link className="ml-4 text-sm underline" href="/account">
-        返回登录
+      <Link className="ml-4 text-sm underline" href="/account"><ArrowLeft size={16} aria-hidden="true" className="control-icon"/>
+        Back to sign in
       </Link>
-      {!tokenHash && (
-        <Feedback message="链接缺少有效确认信息，请从注册邮件重新进入" error />
+      {!tokenHash && !code && (
+        <Feedback message="This link is incomplete. Open the confirmation link from your sign-up email." error />
       )}
     </Card>
   );

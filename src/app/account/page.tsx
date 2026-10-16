@@ -2,8 +2,9 @@ import { PageHeading } from "@/components/ui";
 import { AccountForm, SignedInAccount } from "@/components/core/account";
 import { AccessGate } from "@/components/core/access-gate";
 import { accountState } from "@/lib/server/supabase";
+import { GlassCompanion } from "@/components/glass-companion";
 export const dynamic = "force-dynamic";
-export const metadata = { title: "账号" };
+export const metadata = { title: "Account" };
 export default async function AccountPage({
   searchParams,
 }: {
@@ -21,10 +22,12 @@ export default async function AccountPage({
     <>
       <PageHeading
         eyebrow="YOUR OWN LITTLE SPACE"
-        title="让故事，有自己的归属"
-        description="私人记录只属于你的账号。记录与角色记忆分别管理，由你决定使用范围。"
+        title="Your own little space"
+        description="Your entries belong to your account. You choose what stays private and what Xiaoqi may use."
       />
-      <div className="max-w-xl">
+      <div className="account-workspace">
+        <aside className="account-welcome"><GlassCompanion state="welcome"/><h2>A place for your moments</h2><p>Your stories stay yours.<br/>You choose what Xiaoqi remembers.</p></aside>
+        <div>
         {state.kind === "authenticated" ? (
           <SignedInAccount
             userId={state.userId}
@@ -36,6 +39,7 @@ export default async function AccountPage({
         ) : (
           <AccessGate state={state} returnTo="/account" />
         )}
+        </div>
       </div>
     </>
   );

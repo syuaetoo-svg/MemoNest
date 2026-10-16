@@ -1,4 +1,5 @@
 "use client";
+import { RefreshCw } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState, type ReactNode } from "react";
 import { api, ClientError, IdentityContext } from "@/lib/core/client";
@@ -39,12 +40,12 @@ export function SessionBoundary({
   if (expired)
     return (
       <Card>
-        <h2 className="text-xl font-semibold">会话已变化</h2>
+        <h2 className="text-xl font-semibold">Your session has changed</h2>
         <p role="alert" className="my-4 text-sm leading-7">
-          已清除当前页面的私人内容与临时输入，避免被保存到其他账号。请重新登录。
+          Private content and unsaved inputs on this page have been cleared to prevent saving to another account. Please sign in again.
         </p>
-        <Link className="primary-link" href="/account">
-          重新登录
+        <Link className="primary-link" href="/account"><RefreshCw size={16} aria-hidden="true" className="control-icon"/>
+          Sign in again
         </Link>
       </Card>
     );
